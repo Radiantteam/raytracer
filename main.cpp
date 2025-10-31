@@ -2,6 +2,7 @@
 #include "Color.hpp"
 #include "src/image/Image.hpp"
 #include "src/sphere/Sphere.hpp"
+#include "src/plane/Plane.hpp"
 
 using namespace std;
 
@@ -24,6 +25,9 @@ int main() {
         120.0f,
         Color(0.75f, 0.8f, 0.95f)
     );
+
+    Plane sol(Vec3{0.0f, -0.5f, 0.0f}, Vec3{0.0f, 1.0f, 0.0f}, Color(0.2f, 0.8f, 0.3f));
+    Plane::Draw(image, sol);
 
     image.WriteFile("test.png");
     std::cout << "Wrote test.png\n";
