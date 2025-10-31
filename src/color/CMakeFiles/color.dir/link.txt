@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcolor.a CMakeFiles/color.dir/Color.cpp.o
+/usr/bin/ranlib libcolor.a
