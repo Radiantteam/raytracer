@@ -13,9 +13,9 @@ target_include_directories(raytracer PUBLIC
                            "${PROJECT_SOURCE_DIR}/src/rayimage"
                            )
 
-add_subdirectory(./src/raymath)
-add_subdirectory(./src/rayimage)
-add_subdirectory(./src/lodepng)
+add_subdirectory(src/raymath)
+add_subdirectory(src/rayimage)
+add_subdirectory(src/lodepng)
 
 target_link_libraries(raytracer PUBLIC 
                       raymath
