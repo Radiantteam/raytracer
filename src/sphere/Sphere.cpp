@@ -8,14 +8,17 @@
  */
 static inline float clamp01(float v) { return std::max(0.0f, std::min(1.0f, v)); }
 
-void Sphere::Draw(
-    Image& img,
-    int cx, int cy,
-    float radius,
-    const Color& baseColor
-) {
+Sphere::Sphere(const Vec3& center, float radius, const Color& color)
+    : _center(center), _radius(radius), _color(color) {
+}
+
+void Sphere::Draw(Image& img) const {
     const int W = img.GetWidth();
     const int H = img.GetHeight();
+
+    const int cx = static_cast<int>(_center.x);
+    const int cy = static_cast<int>(_center.y);
+    const float radius = _radius;
 
     // ambient → quantité minimale de lumière présente même dans l’ombre
     const float ambient = 0.12f;
@@ -24,10 +27,10 @@ void Sphere::Draw(
     const Vec3  lightDir = normalize(Vec3{0.0f, 0.0f, 1.0f});
 
     // Définit une zone rectangulaire autour de la sphère à dessiner
-    const int x0 = std::max(0,     int(std::floor(cx - radius)));
-    const int x1 = std::min(W - 1, int(std::ceil (cx + radius)));
-    const int y0 = std::max(0,     int(std::floor(cy - radius)));
-    const int y1 = std::min(H - 1, int(std::ceil (cy + radius)));
+    const int x0 = std::max(0,     static_cast<int>(std::floor(cx - radius)));
+    const int x1 = std::min(W - 1, static_cast<int>(std::ceil (cx + radius)));
+    const int y0 = std::max(0,     static_cast<int>(std::floor(cy - radius)));
+    const int y1 = std::min(H - 1, static_cast<int>(std::ceil (cy + radius)));
 
     const float r2 = radius * radius;
 
@@ -53,9 +56,9 @@ void Sphere::Draw(
             img.SetPixel(
                 x, y,
                 Color(
-                    clamp01(baseColor.R() * shade),
-                    clamp01(baseColor.G() * shade),
-                    clamp01(baseColor.B() * shade)
+                    clamp01(_color.R() * shade),
+                    clamp01(_color.G() * shade),
+                    clamp01(_color.B() * shade)
                 )
             );
         }
