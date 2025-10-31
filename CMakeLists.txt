@@ -8,6 +8,8 @@ add_executable(raytracer main.cpp
         src/sphere/Sphere.cpp
         src/sphere/Sphere.hpp
         src/vec/Vec3.hpp
+        src/plane/Plane.cpp
+        src/plane/Plane.hpp
 )
 
 

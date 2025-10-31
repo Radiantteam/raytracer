@@ -4,6 +4,7 @@
 #include "src/vec/Vec3.hpp"
 #include "src/ray/Ray.hpp"
 #include "src/sphere/Sphere.hpp"
+#include "src/plane/Plane.hpp"
 
 int main()
 {
@@ -76,6 +77,9 @@ int main()
             image.SetPixel(x, y, finalCol);
         }
     }
+
+    Plane sol(Vec3{0.0f, -0.5f, 0.0f}, Vec3{0.0f, 1.0f, 0.0f}, Color(0.2f, 0.8f, 0.3f));
+    Plane::Draw(image, sol);
 
     image.WriteFile("test.png");
     std::cout << "widthrote test.png\n";
