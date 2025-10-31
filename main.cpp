@@ -1,33 +1,31 @@
 #include <iostream>
 #include "Color.hpp"
-#include "Image.hpp"
+#include "src/image/Image.hpp"
+#include "src/sphere/Sphere.hpp"
 
 using namespace std;
 
+int main() {
+    // fond sombre par défaut
+    Image image(1920, 1080, Color(0.1f, 0.1f, 0.12f));
 
-int main()
-{    
-    Color red(1, 0, 0);
-    Color green(0, 1, 0);
-    Color black;
+    Sphere::Draw(
+        image,
+        image.GetWidth() / 2,
+        image.GetHeight() / 2,
+        250.0f,
+        Color(0.85f, 0.2f, 0.2f)
+    );
 
-    cout << "Red : " << red << std::endl;
-    cout << "Green : " << green << std::endl;
-    cout << "Black : " << black << std::endl;
-
-    Color yellow = red + green;
-
-    cout << "Yellow : " << yellow << std::endl;
-
-    // Create an image in memory, and fill it with yellow
-    Image image(512, 512, yellow);
-
-    // Make a red square on the top left of the image
-    for (int y = 0; y < 100; y++) {
-      for (int x = 0; x < 100; x++) {
-        image.SetPixel(x, y, Color(1, 0, 0));
-      }
-    }
+    Sphere::Draw(
+        image,
+        image.GetWidth() / 3,
+        image.GetHeight() / 3,
+        120.0f,
+        Color(0.75f, 0.8f, 0.95f)
+    );
 
     image.WriteFile("test.png");
+    std::cout << "Wrote test.png\n";
+    return 0;
 }
