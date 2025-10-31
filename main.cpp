@@ -1,16 +1,33 @@
 #include <iostream>
+#include <vector>
+#include <memory>
+
 #include "Color.hpp"
 #include "Ray.hpp"
 #include "src/image/Image.hpp"
 #include "src/sphere/Sphere.hpp"
 #include "src/plane/Plane.hpp"
+#include "src/cube/Cube.hpp"
+#include "../Shape.hpp"
+#include "src/vec/Vec3.hpp"
 
-int main()
-{
-    const int width = 800;
-    const int height = 600;
+int main() {
+    const int width = 1920;
+    const int height = 1080;
+
+    // fond sombre par défaut
     Image image(width, height, Color(0.1f, 0.1f, 0.12f));
 
+    std::vector<std::unique_ptr<Shape>> scene;
+    scene.push_back(std::make_unique<Sphere>(
+        Vec3(width / 2.0f, height / 2.0f, 0), 250.0f, Color(0.85f, 0.2f, 0.2f)
+    ));
+    scene.push_back(std::make_unique<Sphere>(
+        Vec3(width / 3.0f, height / 3.0f, 0), 120.0f, Color(0.75f, 0.8f, 0.95f)
+    ));
+    scene.push_back(std::make_unique<Cube>(
+        Vec3(width * 2.0f / 3.0f, height * 2.0f / 3.0f, 0), 200.0f, Color(0.2f, 0.85f, 0.2f)
+    ));
     Plane sol(
     Vec3{0.0f, -0.5f,  0.0f},   // un point du plan (y négatif → “sol”)
     Vec3{0.0f,  1.0f,  0.0f},   // normale vers le haut
@@ -52,36 +69,9 @@ int main()
             bool hit = false;
             Color finalCol = image.GetPixel(x, y); // background
 
-            float t;
-            if (Sphere::Intersect(center1, r1, ray.o, ray.d, t))
-            {
-                if (t < t_near)
-                {
-                    t_near = t;
-                    hit = true;
-                    Vec3 p = ray.at(t);
-                    Vec3 n = normalize(p - center1);
-                    float lam = std::max(0.0f, dot(n, lightDir));
-                    float shade = ambient + 0.8f * lam;
-                    finalCol = Color(col1.R() * shade, col1.G() * shade, col1.B() * shade);
-                }
-            }
-            if (Sphere::Intersect(center2, r2, ray.o, ray.d, t))
-            {
-                if (t < t_near)
-                {
-                    t_near = t;
-                    hit = true;
-                    Vec3 p = ray.at(t);
-                    Vec3 n = normalize(p - center2);
-                    float lam = std::max(0.0f, dot(n, lightDir));
-                    float shade = ambient + 0.8f * lam;
-                    finalCol = Color(col2.R() * shade, col2.G() * shade, col2.B() * shade);
-                }
-            }
-
-            image.SetPixel(x, y, finalCol);
-        }
+    // Draw all shapes in the scene
+    for (const auto& shape : scene) {
+        shape->Draw(image);
     }
 
 

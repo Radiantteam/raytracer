@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(raytracer main.cpp
         src/sphere/Sphere.cpp
         src/sphere/Sphere.hpp
+        src/cube/Cube.cpp
+        src/cube/Cube.hpp
+        src/Shape.hpp
         src/vec/Vec3.hpp
         src/plane/Plane.cpp
         src/plane/Plane.hpp
@@ -17,6 +20,7 @@ add_executable(raytracer main.cpp
 # Add these lines
 target_include_directories(raytracer PUBLIC
         "${PROJECT_BINARY_DIR}"
+        "src"
         "src/color"
         "src/image"
         "src/lodepng"

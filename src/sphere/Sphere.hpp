@@ -1,22 +1,19 @@
 #pragma once
 
-#include "Image.hpp"
+#include "../Shape.hpp"
 #include "../vec/Vec3.hpp"
+#include "image/Image.hpp"
 
 // Dessine une sphère centrée (cx, cy), rayon en pixels, teintée par baseColor.
 // Éclairage minimal : ambiant + Lambert
-class Sphere
-{
+class Sphere : public Shape {
 public:
-    static void Draw(
-        Image &img,
-        int cx, int cy,
-        float radius,
-        const Color &baseColor);
+    Sphere(const Vec3& center, float radius, const Color& color);
 
-    // Ray-sphere intersection helper:
-    // returns true if ray (o + t*d) intersects sphere with given center/radius,
-    // and writes nearest positive t to out_t.
-    static bool Intersect(const Vec3 &center, float radius,
-                          const Vec3 &o, const Vec3 &d, float &out_t);
+    void Draw(Image& img) const override;
+
+private:
+    Vec3 _center;
+    float _radius;
+    Color _color;
 };
