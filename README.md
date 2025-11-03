@@ -1,18 +1,21 @@
 # Raytracer
 
-Base of the project
-Test to connect JIRA
+## Prérequis
+Assurez-vous d'avoir installé :
+- CMake (3.20)
+- Un compilateur C++ compatible C++23
 
-Commande : 
-
-## Build step
-```
-mkdir build  && cd build
-```
-
-## Launch script 
-```
-cmake --build ../ . && ./raytracer
+## Génération du projet
+```bash
+cmake -S . -B build
 ```
 
+## Compilation
+```bash
+cmake --build build -j
+```
 
+## Exécution des tests unitaires
+```bash
+cd build && ctest --output-on-failure
+```

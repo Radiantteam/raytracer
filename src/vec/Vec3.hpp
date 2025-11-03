@@ -15,7 +15,7 @@ struct Vec3 {
 
     Vec3& operator+=(const Vec3& v){ x+=v.x; y+=v.y; z+=v.z; return *this; }
 
-    // unaire négatif
+    // unaire négatif -> permet d'obtenir l'opposé d'un vecteur
     Vec3 operator-() const { return {-x, -y, -z}; }
 };
 
