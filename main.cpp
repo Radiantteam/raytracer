@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Color.hpp"
+#include "Ray.hpp"
 #include "src/image/Image.hpp"
 #include "src/sphere/Sphere.hpp"
 #include "src/plane/Plane.hpp"
