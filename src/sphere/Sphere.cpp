@@ -70,23 +70,26 @@ void Sphere::Draw(Image& img) const {
 // Ray-sphere intersection implementation.
 // Solves: || o + t*d - center ||^2 = r^2, with d assumed normalized.
 // Quadratic: t^2 + 2*dot(d,oc)*t + dot(oc,oc)-r^2 = 0, where oc = o - center
-bool Sphere::Intersect(const Vec3 &center, float radius,
-                       const Vec3 &o, const Vec3 &d, float &out_t)
+bool Sphere::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
 {
-    Vec3 oc = o - center;
+    Vec3 oc = o - _center;
     float b = 2.0f * dot(d, oc);
-    float c = dot(oc, oc) - radius * radius;
+    float c = dot(oc, oc) - _radius * _radius;
     float disc = b * b - 4.0f * c;
+
     if (disc < 0.0f)
         return false;
+
     float sq = std::sqrt(disc);
     float t0 = (-b - sq) * 0.5f;
     float t1 = (-b + sq) * 0.5f;
     float t = t0;
+
     if (t < 0.0f)
         t = t1;
     if (t < 0.0f)
         return false;
+
     out_t = t;
     return true;
 }
