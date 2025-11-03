@@ -30,19 +30,6 @@ int main()
         Color(0.8f, 0.7f, 0.4f));
 
     Plane::Draw(image, sol);
-    // camera au point d'origine, screen plane at z = 1
-    Vec3 camera{0.0f, 0.0f, 0.0f};
-
-    Vec3 center1{0.0f, 0.0f, 3.0f};
-    float r1 = 1.0f;
-    Color col1(0.85f, 0.2f, 0.2f);
-
-    Vec3 center2{-1.0f, 2.0f, 4.0f};
-    float r2 = 0.7f;
-    Color col2(0.75f, 0.8f, 0.95f);
-
-    const Vec3 lightDir = normalize(Vec3{0, 0, -1.0f});
-    const float ambient = 0.12f;
 
     // Simple raytracing : un rayon par colonne, du haut vers le bas
     for (int y = 0; y < height; ++y)
