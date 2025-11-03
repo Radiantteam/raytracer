@@ -19,8 +19,8 @@ std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int he
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> distX(width * 0.2f, width * 0.8f);
-    std::uniform_real_distribution<float> distY(height * 0.3f, height * 0.8f);
+    std::uniform_real_distribution<float> distX(width * 0.1f, width * 0.9f);
+    std::uniform_real_distribution<float> distY(height * 0.3f, height * 0.3f);
     std::uniform_real_distribution<float> distR(40.0f, 180.0f); // rayon
     std::uniform_real_distribution<float> distC(0.2f, 1.0f);    // couleur RGB
     std::uniform_real_distribution<float> distZ(-200.0f, 200.0f); // jeu de profondeur
@@ -47,7 +47,15 @@ int main()
     // fond sombre par défaut
     Image image(width, height, Color(0.1f, 0.1f, 0.12f));
 
-    int sphereCount = 20;
+    int sphereCount;
+    std::cout << "Combien de sphères veux-tu générer ? ";
+    std::cin >> sphereCount;
+
+    if (sphereCount <= 0)
+    {
+        std::cout << "Aucune sphère à générer, sortie.\n";
+        return 0;
+    }
 
 
         // crée les sphères
