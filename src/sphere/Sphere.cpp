@@ -81,8 +81,8 @@ bool Sphere::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
         return false;
 
     float sq = std::sqrt(disc);
-    float t0 = (-b - sq) * 0.5f;
-    float t1 = (-b + sq) * 0.5f;
+    float t0 = (-b - sq) / 2.0f;
+    float t1 = (-b + sq) / 2.0f;
     float t = t0;
 
     if (t < 0.0f)
@@ -92,4 +92,23 @@ bool Sphere::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
 
     out_t = t;
     return true;
+}
+
+Color Sphere::GetShadedColor(const Vec3& hitPoint) const {
+    // Calculer la normale au point d'intersection
+    Vec3 normal = normalize(hitPoint - _center);
+
+    // Lumière venant du haut : direction (0, -1, 0.3) normalisée
+    Vec3 lightDir = normalize(Vec3(0.0f, -1.0f, 0.3f));
+
+    // Éclairage ambiant + diffus (Lambert)
+    const float ambient = 0.2f;
+    float diff = std::max(0.0f, dot(normal, lightDir));
+    float intensity = clamp01(ambient + 0.8f * diff);
+
+    return Color(
+        clamp01(_color.R() * intensity),
+        clamp01(_color.G() * intensity),
+        clamp01(_color.B() * intensity)
+    );
 }

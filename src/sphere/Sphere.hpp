@@ -14,6 +14,8 @@ public:
 
     bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
 
+    const Color& GetColor() const { return _color; }
+    Color GetShadedColor(const Vec3& hitPoint) const;
 private:
     Vec3 _center;
     float _radius;
