@@ -16,6 +16,7 @@ target_include_directories(raytracer PUBLIC
         "src/color"
         "src/image"
         "src/lodepng"
+        "src/ray"
 )
 
 add_subdirectory(src/color)
