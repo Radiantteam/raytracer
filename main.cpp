@@ -1,9 +1,9 @@
 #include <iostream>
-#include "src/color/Color.hpp"
+#include "Color.hpp"
+#include "Ray.hpp"
 #include "src/image/Image.hpp"
-#include "src/vec/Vec3.hpp"
-#include "src/ray/Ray.hpp"
 #include "src/sphere/Sphere.hpp"
+#include "src/plane/Plane.hpp"
 
 int main()
 {
@@ -11,6 +11,13 @@ int main()
     const int height = 600;
     Image image(width, height, Color(0.1f, 0.1f, 0.12f));
 
+    Plane sol(
+    Vec3{0.0f, -0.5f,  0.0f},   // un point du plan (y négatif → “sol”)
+    Vec3{0.0f,  1.0f,  0.0f},   // normale vers le haut
+    Color(0.8f, 0.7f, 0.4f)
+    );
+
+    Plane::Draw(image, sol);
     // camera au point d'origine, screen plane at z = 1
     Vec3 camera{0.0f, 0.0f, 0.0f};
 
@@ -77,7 +84,9 @@ int main()
         }
     }
 
+
+
     image.WriteFile("test.png");
-    std::cout << "widthrote test.png\n";
+    std::cout << "Wrote test.png\n";
     return 0;
 }
