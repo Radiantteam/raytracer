@@ -45,33 +45,18 @@ int main() {
     const Vec3 lightDir = normalize(Vec3{0, 0, -1.0f});
     const float ambient = 0.12f;
 
-    const float viewport_height = 1.0f;
-    const float aspect = float(width) / float(height);
+    // Simple raytracing : un rayon par colonne, du haut vers le bas
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            Ray ray(Vec3(x, y, 500.0f), Vec3(0, 0, -1));
+            Color pixelColor = ray.TraceScene(scene);
 
-    for (int y = 0; y < height; ++y)
-    {
-        for (int x = 0; x < width; ++x)
-        {
-            float ndc_x = (x + 0.5f) / float(width);
-            float ndc_y = (y + 0.5f) / float(height);
-            float sx = (2.0f * ndc_x - 1.0f) * aspect * viewport_height;
-            float sy = 1.0f - 2.0f * ndc_y; // flip Y so top = positive
-
-            Vec3 dir = normalize(Vec3{sx, sy, 1.0f});
-            Ray ray(camera, dir);
-
-            // trace: find nearest intersection
-            float t_near = 1e30f;
-            bool hit = false;
-            Color finalCol = image.GetPixel(x, y); // background
-
-    // Draw all shapes in the scene
-    for (const auto& shape : scene) {
-        // appliquer le intersect
-        shape->Draw(image);
+            // Ne dessiner que si une forme est touchée (couleur non-noire)
+            if (pixelColor.R() > 0.0f || pixelColor.G() > 0.0f || pixelColor.B() > 0.0f) {
+                image.SetPixel(x, y, pixelColor);
+            }
+        }
     }
-
-
 
     image.WriteFile("test.png");
     std::cout << "Wrote test.png\n";

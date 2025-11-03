@@ -14,6 +14,7 @@ add_executable(raytracer main.cpp
         src/plane/Plane.cpp
         src/plane/Plane.hpp
         src/ray/Ray.hpp
+        src/ray/Ray.cpp
 )
 
 
