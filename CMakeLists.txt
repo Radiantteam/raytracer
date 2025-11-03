@@ -9,7 +9,7 @@ add_executable(raytracer main.cpp
         src/sphere/Sphere.hpp
         src/cube/Cube.cpp
         src/cube/Cube.hpp
-        src/Shape.hpp
+        src/Shape.cpp
         src/vec/Vec3.hpp
         src/plane/Plane.cpp
         src/plane/Plane.hpp
