@@ -8,11 +8,13 @@
  */
 static inline float clamp01(float v) { return std::max(0.0f, std::min(1.0f, v)); }
 
-Cube::Cube(const Vec3& center, float size, const Color& color)
-    : _center(center), _size(size), _color(color) {
+Cube::Cube(const Vec3 &center, float size, const Color &color)
+    : _center(center), _size(size), _color(color)
+{
 }
 
-void Cube::Draw(Image& img) const {
+void Cube::Draw(Image &img) const
+{
     const int W = img.GetWidth();
     const int H = img.GetHeight();
     const int cx = static_cast<int>(_center.x);
@@ -41,9 +43,52 @@ void Cube::Draw(Image& img) const {
     const int y0 = std::max(0, cy - halfSize);
     const int y1 = std::min(H - 1, cy + halfSize);
 
-    for (int y = y0; y <= y1; ++y) {
-        for (int x = x0; x <= x1; ++x) {
+    for (int y = y0; y <= y1; ++y)
+    {
+        for (int x = x0; x <= x1; ++x)
+        {
             img.SetPixel(x, y, finalColor);
         }
     }
+}
+
+bool Cube::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
+{
+    Vec3 half = Vec3{_size / 2, _size / 2, _size / 2};
+    Vec3 min = _center - half;
+    Vec3 max = _center + half;
+
+    float tmin = (min.x - o.x) / d.x;
+    float tmax = (max.x - o.x) / d.x;
+    if (tmin > tmax)
+        std::swap(tmin, tmax);
+
+    float tymin = (min.y - o.y) / d.y;
+    float tymax = (max.y - o.y) / d.y;
+    if (tymin > tymax)
+        std::swap(tymin, tymax);
+
+    if ((tmin > tymax) || (tymin > tmax))
+        return false;
+
+    if (tymin > tmin)
+        tmin = tymin;
+    if (tymax < tmax)
+        tmax = tymax;
+
+    float tzmin = (min.z - o.z) / d.z;
+    float tzmax = (max.z - o.z) / d.z;
+    if (tzmin > tzmax)
+        std::swap(tzmin, tzmax);
+
+    if ((tmin > tzmax) || (tzmin > tmax))
+        return false;
+
+    if (tzmin > tmin)
+        tmin = tzmin;
+    if (tzmax < tmax)
+        tmax = tzmax;
+
+    out_t = tmin >= 0 ? tmin : tmax;
+    return out_t >= 0;
 }

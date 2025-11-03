@@ -12,6 +12,8 @@ public:
 
     void Draw(Image& img) const override;
 
+    bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
+
 private:
     Vec3 _center;
     float _radius;
