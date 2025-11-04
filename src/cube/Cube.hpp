@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Shape.hpp"
-#include "../image/Image.hpp"
-#include "../vec/Vec3.hpp"
+#include "shape/Shape.hpp"
+#include "image/Image.hpp"
+#include "vec/Vec3.hpp"
 
 // Dessine un cube centré (cx, cy), de côté 'size', teinté par baseColor.
 // Éclairage minimal : ambiant + Lambert

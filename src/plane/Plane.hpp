@@ -2,10 +2,10 @@
 
 #include <vector>
 #include <memory>
-#include "../vec/Vec3.hpp"
-#include "../color/Color.hpp"
-#include "../image/Image.hpp"
-#include "../Shape.hpp"
+#include "vec/Vec3.hpp"
+#include "color/Color.hpp"
+#include "image/Image.hpp"
+#include "shape/Shape.hpp"
 
 class Plane : public Shape {
 public:

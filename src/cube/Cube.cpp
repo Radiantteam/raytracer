@@ -1,4 +1,4 @@
-#include "./Cube.hpp"
+#include "Cube.hpp"
 #include <algorithm>
 #include <cmath>
 
@@ -98,44 +98,3 @@ bool Cube::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
     out_t = t_hit;
     return true;
 }
-
-// bool Cube::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
-// {
-//     Vec3 half = Vec3{_size / 2, _size / 2, _size / 2};
-//     Vec3 min = _center - half;
-//     Vec3 max = _center + half;
-
-//     float tmin = (min.x - o.x) / d.x;
-//     float tmax = (max.x - o.x) / d.x;
-//     if (tmin > tmax)
-//         std::swap(tmin, tmax);
-
-//     float tymin = (min.y - o.y) / d.y;
-//     float tymax = (max.y - o.y) / d.y;
-//     if (tymin > tymax)
-//         std::swap(tymin, tymax);
-
-//     if ((tmin > tymax) || (tymin > tmax))
-//         return false;
-
-//     if (tymin > tmin)
-//         tmin = tymin;
-//     if (tymax < tmax)
-//         tmax = tymax;
-
-//     float tzmin = (min.z - o.z) / d.z;
-//     float tzmax = (max.z - o.z) / d.z;
-//     if (tzmin > tzmax)
-//         std::swap(tzmin, tzmax);
-
-//     if ((tmin > tzmax) || (tzmin > tmax))
-//         return false;
-
-//     if (tzmin > tmin)
-//         tmin = tzmin;
-//     if (tzmax < tmax)
-//         tmax = tzmax;
-
-//     out_t = tmin >= 0 ? tmin : tmax;
-//     return out_t >= 0;
-// }

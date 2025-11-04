@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../vec/Vec3.hpp"
-#include "../color/Color.hpp"
-#include "../Shape.hpp"
+#include "vec/Vec3.hpp"
+#include "color/Color.hpp"
+#include "shape/Shape.hpp"
 #include <vector>
 #include <memory>
 
@@ -11,14 +11,15 @@
  * Un rayon est défini par une origine et une direction, permettant de
  * calculer les intersections avec les objets de la scène.
  */
-class Ray {
+class Ray
+{
 public:
   /**
    * Construit un rayon avec une origine et une direction données.
    * @param origin Point de départ du rayon dans l'espace 3D
    * @param direction Vecteur directionnel du rayon (devrait être normalisé)
    */
-  Ray(const Vec3& origin, const Vec3& direction);
+  Ray(const Vec3 &origin, const Vec3 &direction);
 
   /**
    * Lance le rayon à travers la scène et calcule la couleur résultante.
