@@ -62,7 +62,7 @@ int main()
     Image image(width, height, Color(0.155f, 0.0f, 0.0f));
 
     // Configuration de l'anti-aliasing (Random Jitter par défaut)
-    AntiAliasing aa(4);
+    const AntiAliasing anti_aliasing(4);
     AntiAliasing::InitRandom();
  
     // Init barre de progression
@@ -131,8 +131,7 @@ int main()
         }
     }
 
-
-    image.WriteFile("test.png");
     std::cout << "Wrote test.png with " << aa.GetSamplesPerPixel() << " samples/pixel (Random Jitter)\n";
+
     return 0;
 }
