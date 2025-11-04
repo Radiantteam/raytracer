@@ -4,52 +4,36 @@ project(raytracer VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(raytracer main.cpp
-        src/sphere/Sphere.cpp
-        src/sphere/Sphere.hpp
-        src/cube/Cube.cpp
-        src/cube/Cube.hpp
-        src/Shape.cpp
-        src/vec/Vec3.hpp
-        src/plane/Plane.cpp
-        src/plane/Plane.hpp
-        src/ray/Ray.hpp
-        src/ray/Ray.cpp
+add_subdirectory(src)
+
+add_executable(raytracer main.cpp)
+
+target_link_libraries(raytracer
+    PRIVATE
+        renderer
 )
 
+target_include_directories(raytracer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# Add these lines
-target_include_directories(raytracer PUBLIC
-        "${PROJECT_BINARY_DIR}"
-        "src"
-        "src/color"
-        "src/image"
-        "src/lodepng"
-        "src/ray"
-)
-
-add_subdirectory(src/color)
-add_subdirectory(src/image)
-add_subdirectory(src/lodepng)
-
-target_link_libraries(raytracer PUBLIC
-        color
-        image
-        lodepng
-)
-
-
-# --- Unit tests (doctest) ---
+# --- Unit tests (Doctest) ---
 enable_testing()
+add_subdirectory(src/tests)
 
-add_executable(vec3_tests
-    src/tests/units/test_vec3.cpp
-        src/tests/units/test_vec3.cpp
-)
-# Allow `#include "src/vec/Vec3.hpp"` and `#include "doctest.h"`
-target_include_directories(vec3_tests PRIVATE
-    src
-    src/tests
-)
 
-add_test(NAME vec3 COMMAND vec3_tests)
+
+# add_executable(unit_tests
+#     src/tests/units/test_main.cpp
+#     src/tests/units/test_vec3.cpp
+#     src/tests/units/test_image.cpp
+#     src/renderer/Renderer.cpp
+#     src/image/Image.cpp
+#     src/lodepng/lodepng.cpp
+# )
+
+
+# target_include_directories(unit_tests PRIVATE
+#     src
+#     src/tests
+# )
+
+# add_test(NAME unit COMMAND unit_tests)
