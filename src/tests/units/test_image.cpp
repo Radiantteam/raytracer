@@ -1,11 +1,25 @@
 #include "../doctest.h"
 #include <chrono>
+#include <filesystem>
 #include "image/Image.hpp"
 #include "color/Color.hpp"
 #include "lodepng/lodepng.h"
 #include "renderer/Renderer.hpp"
 
-TEST_CASE("Full image render time benchmark")
+namespace fs = std::filesystem;
+
+TEST_CASE("A PNG file is present")
+{
+    const int width = 3920;
+    const int height = 2080;
+
+    render_scene(width, height, "test.png");
+
+    // check si un fichier PNG a été généré
+    CHECK(fs::exists("test.png"));
+}
+
+TEST_CASE("Full image render time")
 {
     const int width = 3920;
     const int height = 2080;
