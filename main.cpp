@@ -33,7 +33,7 @@ std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int he
         float radius = distR(gen);
 
         Color color(distC(gen), distC(gen), distC(gen));
-        spheres.push_back(std::make_unique<Sphere>(Vec3{x, y, 0}, radius, color));
+        spheres.push_back(std::make_unique<Sphere>(Vec3{x, y, 0}, radius, color, 0.9f));
     }
 
     return spheres;
@@ -41,8 +41,8 @@ std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int he
 
 int main()
 {
-    const int width = 3920;
-    const int height = 2080;
+    const int width = 3840;
+    const int height = 2160;
 
     // fond sombre par défaut
     Image image(width, height, Color(0.1f, 0.1f, 0.12f));
@@ -62,16 +62,6 @@ int main()
     std::vector<std::unique_ptr<Shape>> scene = GenerateSpheres(sphereCount, width, height);
 
 
-    // scene.push_back(std::make_unique<Cube>(
-    //     Vec3(width * 0.8f, height * 0.5f, 0),
-    //     200.0f,
-    //     Color(0.2f, 0.85f, 0.2f)));
-
-    Plane sol(
-        Vec3{0.0f, -0.5f, 0.0f}, // un point du plan (y négatif → “sol”)
-        Vec3{0.0f, 1.0f, 0.0f},  // normale vers le haut
-        Color(0.8f, 0.7f, 0.4f));
-    std::vector<std::unique_ptr<Shape>> scene;
     scene.push_back(std::make_unique<Sphere>(
         Vec3(width / 2.0f, height / 2.0f, 0), 250.0f, Color(0.85f, 0.2f, 0.2f),0.9f));
     scene.push_back(std::make_unique<Sphere>(Vec3(width * 2.0f / 3.0f, height * 2.0f / 3.0f, 0), 200.0f, Color(0.9f, 0.9f, 0.9f), 0.8f));
