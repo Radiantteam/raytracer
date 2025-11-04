@@ -11,6 +11,34 @@
 #include "../Shape.hpp"
 #include "src/vec/Vec3.hpp"
 
+#include <random>
+
+std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int height)
+{
+    std::vector<std::unique_ptr<Shape>> spheres;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> distX(width * 0.1f, width * 0.9f);
+    std::uniform_real_distribution<float> distY(height * 0.3f, height * 0.3f);
+    std::uniform_real_distribution<float> distR(40.0f, 180.0f); // rayon
+    std::uniform_real_distribution<float> distC(0.2f, 1.0f);    // couleur RGB
+    std::uniform_real_distribution<float> distZ(-200.0f, 200.0f); // jeu de profondeur
+
+
+    for (int i = 0; i < count; ++i)
+    {
+        float x = distX(gen);
+        float y = distY(gen);
+        float radius = distR(gen);
+
+        Color color(distC(gen), distC(gen), distC(gen));
+        spheres.push_back(std::make_unique<Sphere>(Vec3{x, y, 0}, radius, color));
+    }
+
+    return spheres;
+}
+
 int main()
 {
     const int width = 3920;
@@ -19,17 +47,36 @@ int main()
     // fond sombre par défaut
     Image image(width, height, Color(0.1f, 0.1f, 0.12f));
 
-    std::vector<std::unique_ptr<Shape>> scene;
-    scene.push_back(std::make_unique<Sphere>(
-        Vec3(width / 2.0f, height / 2.0f, 0), 250.0f, Color(0.85f, 0.2f, 0.2f)));
-    scene.push_back(std::make_unique<Sphere>(
-        Vec3(width * 2.0f / 3.0f, height * 2.0f / 3.0f, 0), 200.0f, Color(0.2f, 0.85f, 0.2f)));
+    int sphereCount;
+    std::cout << "Combien de sphères veux-tu générer ? ";
+    std::cin >> sphereCount;
+
+    if (sphereCount <= 0)
+    {
+        std::cout << "Aucune sphère à générer, sortie.\n";
+        return 0;
+    }
+
+
+        // crée les sphères
+    std::vector<std::unique_ptr<Shape>> scene = GenerateSpheres(sphereCount, width, height);
+
+
+    // scene.push_back(std::make_unique<Cube>(
+    //     Vec3(width * 0.8f, height * 0.5f, 0),
+    //     200.0f,
+    //     Color(0.2f, 0.85f, 0.2f)));
+
     Plane sol(
         Vec3{0.0f, -0.5f, 0.0f}, // un point du plan (y négatif → “sol”)
         Vec3{0.0f, 1.0f, 0.0f},  // normale vers le haut
         Color(0.8f, 0.7f, 0.4f));
 
     Plane::Draw(image, sol);
+
+
+    // camera au point d'origine, screen plane at z = 1
+    Vec3 camera{0.0f, 0.0f, 0.0f};
 
     // Simple raytracing : un rayon par colonne, du haut vers le bas
     for (int y = 0; y < height; ++y)
