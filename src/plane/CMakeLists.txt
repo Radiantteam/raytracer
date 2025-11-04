@@ -1,5 +1,5 @@
 add_library(plane
-        plane.cpp
+    ../plane/plane.cpp
 )
 
 target_include_directories(plane
