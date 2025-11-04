@@ -11,13 +11,15 @@ TEST_CASE("Full image render time benchmark")
     const int height = 2080;
 
     auto start = std::chrono::high_resolution_clock::now();
-    render_scene(width, height, "benchmark_test.png");
+    render_scene(width, height, "test.png");
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> duration = end - start;
 
     INFO("Render took " << duration.count() << " seconds");
-    CHECK(duration.count() < 10.0); // for example, expect render < 10s
+
+    // check si le rendering time est inférieur à 10 secondes
+    CHECK(duration.count() < 10.0);
 }
 
 TEST_CASE("Image has background color, width and height")
