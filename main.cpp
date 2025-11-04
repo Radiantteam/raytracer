@@ -10,7 +10,7 @@
 #include "src/plane/Plane.hpp"
 #include "src/cube/Cube.hpp"
 #include "../Shape.hpp"
-#include "anti_aliasing_sampler/AntiAliasing.h"
+#include "anti_aliasing/AntiAliasing.h"
 #include "progress_bar/ProgressBar.h"
 #include "src/vec/Vec3.hpp"
 #include "src/generator/SphereGenerator.hpp"
