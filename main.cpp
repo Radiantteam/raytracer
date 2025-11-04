@@ -15,6 +15,34 @@
 #include "src/vec/Vec3.hpp"
 #include "src/generator/SphereGenerator.hpp"
 
+#include <random>
+
+std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int height)
+{
+    std::vector<std::unique_ptr<Shape>> spheres;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> distX(width * 0.1f, width * 0.9f);
+    std::uniform_real_distribution<float> distY(height * 0.3f, height * 0.3f);
+    std::uniform_real_distribution<float> distR(40.0f, 180.0f); // rayon
+    std::uniform_real_distribution<float> distC(0.2f, 1.0f);    // couleur RGB
+    std::uniform_real_distribution<float> distZ(-200.0f, 200.0f); // jeu de profondeur
+
+
+    for (int i = 0; i < count; ++i)
+    {
+        float x = distX(gen);
+        float y = distY(gen);
+        float radius = distR(gen);
+
+        Color color(distC(gen), distC(gen), distC(gen));
+        spheres.push_back(std::make_unique<Sphere>(Vec3{x, y, 0}, radius, color));
+    }
+
+    return spheres;
+}
+
 int main()
 {
     const int width = 3840;
@@ -32,6 +60,15 @@ int main()
     std::cin >> sphereCount;
 
     if (sphereCount <= 0)
+    {
+        std::cout << "Aucune sphère à générer, sortie.\n";
+        return 0;
+    }
+
+
+    Vec3 camera{0.0f, 0.0f, 0.0f};
+
+    for (int y = 0; y < height; ++y)
     {
         std::cout << "Aucune sphère à générer, sortie.\n";
         return 0;
