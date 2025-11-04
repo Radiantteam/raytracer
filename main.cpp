@@ -71,8 +71,18 @@ int main()
         Vec3{0.0f, -0.5f, 0.0f}, // un point du plan (y négatif → “sol”)
         Vec3{0.0f, 1.0f, 0.0f},  // normale vers le haut
         Color(0.8f, 0.7f, 0.4f));
+    std::vector<std::unique_ptr<Shape>> scene;
+    scene.push_back(std::make_unique<Sphere>(
+        Vec3(width / 2.0f, height / 2.0f, 0), 250.0f, Color(0.85f, 0.2f, 0.2f),0.9f));
+    scene.push_back(std::make_unique<Sphere>(Vec3(width * 2.0f / 3.0f, height * 2.0f / 3.0f, 0), 200.0f, Color(0.9f, 0.9f, 0.9f), 0.8f));
+    // Add the plane to the main scene
+    scene.push_back(std::make_unique<Plane>(
+        Vec3(0, height * 0.9f, 0), // A point on the plane (floor)
+        Vec3(0, -1, 0),            // Normal pointing UP (towards smaller Y)
+        0.5f));                    // reflectivity
 
-    Plane::Draw(image, sol);
+    // Define a single perspective camera
+    Vec3 camOrigin = {width / 2.0f, height / 2.0f, -800.0f};
 
 
     // camera au point d'origine, screen plane at z = 1
@@ -83,7 +93,8 @@ int main()
     {
         for (int x = 0; x < width; ++x)
         {
-            Ray ray(Vec3(x, y, 500.0f), Vec3(0, 0, -1));
+            Vec3 rayTarget(x, y, 0);
+            Ray ray(camOrigin, normalize(rayTarget - camOrigin));
             Color pixelColor = ray.TraceScene(scene);
 
             // Ne dessiner que si une forme est touchée (couleur non-noire)

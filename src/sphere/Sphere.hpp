@@ -8,7 +8,7 @@
 // Éclairage minimal : ambiant + Lambert
 class Sphere : public Shape {
 public:
-    Sphere(const Vec3& center, float radius, const Color& color);
+    Sphere(const Vec3& center, float radius, const Color& color, float reflectivity = 0.0f);
 
     void Draw(Image& img) const override;
 
@@ -16,8 +16,11 @@ public:
 
     const Color& GetColor() const { return _color; }
     Color GetShadedColor(const Vec3& hitPoint) const;
+    const Vec3& GetCenter() const { return _center; }
+    float GetReflectivity() const { return _reflectivity; }
 private:
     Vec3 _center;
     float _radius;
     Color _color;
+    float _reflectivity;
 };
