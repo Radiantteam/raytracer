@@ -23,6 +23,10 @@ add_executable(raytracer main.cpp
         src/anti_aliasing/AntiAliasing.h
         src/generator/SphereGenerator.cpp
         src/generator/SphereGenerator.hpp
+        src/progress_bar/ProgressBar.cpp
+        src/progress_bar/ProgressBar.h
+        src/anti_aliasing_sampler/AntiAliasing.cpp
+        src/anti_aliasing_sampler/AntiAliasing.h
 )
 
 
