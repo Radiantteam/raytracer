@@ -10,8 +10,6 @@ class Sphere : public Shape {
 public:
     Sphere(const Vec3& center, float radius, const Color& color, float reflectivity = 0.0f);
 
-    void Draw(Image& img) const override;
-
     bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
 
     const Color& GetColor() const { return _color; }

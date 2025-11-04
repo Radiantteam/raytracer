@@ -10,6 +10,8 @@
 #include "src/plane/Plane.hpp"
 #include "src/cube/Cube.hpp"
 #include "../Shape.hpp"
+#include "anti_aliasing_sampler/AntiAliasing.h"
+#include "progress_bar/ProgressBar.h"
 #include "src/vec/Vec3.hpp"
 #include "src/generator/SphereGenerator.hpp"
 
@@ -19,6 +21,11 @@ int main()
     const int height = 2160;
 
     Image image(width, height);
+
+
+    // Configuration de l'anti-aliasing (Random Jitter par défaut)
+    AntiAliasing aa(4);
+    AntiAliasing::InitRandom();
 
     int sphereCount;
     std::cout << "Combien de sphères veux-tu générer ? ";
@@ -83,7 +90,8 @@ int main()
         }
     }
 
+
     image.WriteFile("test.png");
-    std::cout << "Wrote test.png\n";
+    std::cout << "Wrote test.png with " << aa.GetSamplesPerPixel() << " samples/pixel (Random Jitter)\n";
     return 0;
 }

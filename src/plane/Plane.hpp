@@ -19,5 +19,5 @@ public:
     bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
 
     // The Draw method is now part of the Shape interface, but not used for raytracing
-    void Draw(Image& img) const override;
+    void Draw(Image& img) const ;
 };

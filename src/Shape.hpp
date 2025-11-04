@@ -9,7 +9,6 @@ public:
     // Declare destructor out-of-line so we can provide a single key function
     // (this ensures the vtable/typeinfo are emitted in one translation unit).
     virtual ~Shape();                        // Virtual destructor for polymorphism
-    virtual void Draw(Image &img) const = 0; // Pure virtual function
 
     // Méthode d’intersection générique (à spécialiser par forme)
     // Make it pure virtual so Shape remains abstract and each derived shape
