@@ -11,48 +11,7 @@
 #include "src/cube/Cube.hpp"
 #include "../Shape.hpp"
 #include "src/vec/Vec3.hpp"
-
-#include <random>
-
-std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int height)
-{
-    std::vector<std::unique_ptr<Shape>> spheres;
-
-    if (count <= 0) return spheres;
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> distC(0.2f, 1.0f);    // couleur RGB
-
-    // Fixed radius for all spheres
-    const float radius = 150.0f;
-
-    // All spheres on horizontal line at Y = 0
-    float centerY = 0.0f;
-
-    // Calculate spacing between sphere centers (diameter + some gap)
-    float spacingX = radius * 2.5f;  // 2.5 = 2 radii + 0.5 gap
-
-    // Calculate total width needed for all spheres
-    float totalWidth = (count - 1) * spacingX;
-
-    // Center the horizontal line
-    float startX = (width - totalWidth) / 2.0f;
-
-    // Random Z distribution for depth variation
-    std::uniform_real_distribution<float> distZ(-400.0f, 400.0f);
-
-    for (int i = 0; i < count; ++i)
-    {
-        float x = startX + i * spacingX;
-        float z = distZ(gen);
-
-        Color color(distC(gen), distC(gen), distC(gen));
-        spheres.push_back(std::make_unique<Sphere>(Vec3{x, centerY, z}, radius, color, 0.9f));
-    }
-
-    return spheres;
-}
+#include "src/generator/SphereGenerator.hpp"
 
 int main()
 {
@@ -71,7 +30,7 @@ int main()
         return 0;
     }
 
-    std::vector<std::unique_ptr<Shape>> scene = GenerateSpheres(sphereCount, width, height);
+    std::vector<std::unique_ptr<Shape>> scene = SphereGenerator::Generate(sphereCount, width, height);
 
     // Add the plane to the main scene (below the spheres)
     scene.push_back(std::make_unique<Plane>(
