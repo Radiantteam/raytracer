@@ -1,8 +1,8 @@
 #pragma once
 
-#include "vec/Vec3.hpp"
-#include "color/Color.hpp"
-#include "shape/Shape.hpp"
+#include "Vec3.hpp"
+#include "Color.hpp"
+#include "Shape.hpp"
 #include <vector>
 #include <memory>
 

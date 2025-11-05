@@ -1,4 +1,4 @@
-#include "Renderer.hpp"
+#include "../include/Renderer.hpp"
 #include <iostream>
 
 void render_scene(int width, int height, const char *outputFile)

@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <vector>
-#include "color/Color.hpp"
+#include "Color.hpp"
 
 class Image
 {

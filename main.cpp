@@ -1,4 +1,4 @@
-#include "renderer/Renderer.hpp"
+#include "include/Renderer.hpp"
 
 int main()
 {

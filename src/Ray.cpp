@@ -1,5 +1,5 @@
-#include "Ray.hpp"
-#include "../sphere/Sphere.hpp"
+#include "../include/Ray.hpp"
+#include "../include/Sphere.hpp"
 
 Ray::Ray(const Vec3 &origin, const Vec3 &direction)
     : _origin(origin), _direction(direction)
