@@ -65,15 +65,6 @@ int main()
         return 0;
     }
 
-
-    Vec3 camera{0.0f, 0.0f, 0.0f};
-
-    for (int y = 0; y < height; ++y)
-    {
-        std::cout << "Aucune sphère à générer, sortie.\n";
-        return 0;
-    }
-
     std::vector<std::unique_ptr<Shape>> scene = SphereGenerator::Generate(sphereCount, width, height);
 
     // Add the plane to the main scene (below the spheres)
