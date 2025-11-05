@@ -3,12 +3,12 @@
 #include <fstream>
 #include <vector>
 #include <memory>
-#include "src/Shape.hpp"
-#include "src/sphere/Sphere.hpp"
-#include "src/plane/Plane.hpp"
-#include "src/cube/Cube.hpp"
-#include "src/vec/Vec3.hpp"
-#include "src/color/Color.hpp"
+#include "../Shape.hpp"
+#include "../sphere/Sphere.hpp"
+#include "../plane/Plane.hpp"
+#include "../cube/Cube.hpp"
+#include "../vec/Vec3.hpp"
+#include "../color/Color.hpp"
 
 using json = nlohmann::json;
 
