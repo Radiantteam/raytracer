@@ -60,5 +60,5 @@ Color Ray::TraceScene(const std::vector<std::unique_ptr<Shape>>& scene, int dept
     }
 
     // Sinon retourner couleur de fond (transparente, sera ignorée)
-    return Color(0.0f, 0.0f, 0.0f);
+    return Color(0.53f, 0.81f, 0.92f);
 }
