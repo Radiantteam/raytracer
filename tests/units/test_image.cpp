@@ -1,10 +1,10 @@
 #include "../doctest.h"
 #include <chrono>
 #include <filesystem>
-#include "image/Image.hpp"
-#include "color/Color.hpp"
-#include "lodepng/lodepng.h"
-#include "renderer/Renderer.hpp"
+#include "Image.hpp"
+#include "Color.hpp"
+#include "lodepng.h"
+#include "Renderer.hpp"
 
 namespace fs = std::filesystem;
 

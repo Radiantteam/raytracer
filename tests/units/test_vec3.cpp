@@ -1,5 +1,5 @@
 #include "../doctest.h"
-#include "vec/Vec3.hpp"
+#include "Vec3.hpp"
 
 TEST_CASE("Vec3 default constructor initializes to zero")
 {

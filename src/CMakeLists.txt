@@ -1,10 +1,20 @@
-add_subdirectory(lodepng)
-add_subdirectory(vec)
-add_subdirectory(color)
-add_subdirectory(image)
-add_subdirectory(ray)
-add_subdirectory(shape)
-add_subdirectory(sphere)
-add_subdirectory(cube)
-add_subdirectory(plane)
-add_subdirectory(renderer)
+add_library(raytracer_lib STATIC
+        lodepng.cpp
+        Color.cpp
+        Image.cpp
+        Ray.cpp
+        Shape.cpp
+        Sphere.cpp
+        Cube.cpp
+        Plane.cpp
+        Renderer.cpp
+)
+
+target_include_directories(raytracer_lib
+        PUBLIC
+        ${PROJECT_SOURCE_DIR}/include
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_compile_features(raytracer_lib PUBLIC cxx_std_23)

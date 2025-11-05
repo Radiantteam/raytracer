@@ -1,4 +1,4 @@
-#include "Cube.hpp"
+#include "../include/Cube.hpp"
 #include <algorithm>
 #include <cmath>
 

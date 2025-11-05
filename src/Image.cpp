@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
-#include "Image.hpp"
-#include "lodepng/lodepng.h"
+#include "../include/Image.hpp"
+#include "../include/lodepng.h"
 
 Image::Image(unsigned int w, unsigned int h) : width(w), height(h)
 {

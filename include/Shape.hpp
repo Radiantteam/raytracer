@@ -1,7 +1,7 @@
 #pragma once
 
-#include "image/Image.hpp"
-#include "vec/Vec3.hpp"
+#include "Image.hpp"
+#include "Vec3.hpp"
 
 class Shape
 {

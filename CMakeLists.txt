@@ -5,16 +5,13 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(src)
+add_subdirectory(tests)
 
 add_executable(raytracer main.cpp)
 
 target_link_libraries(raytracer
-    PRIVATE
-        renderer
+        PRIVATE
+        raytracer_lib
 )
 
-target_include_directories(raytracer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-
-# --- Unit tests (Doctest) ---
-enable_testing()
-add_subdirectory(src/tests)
+target_include_directories(raytracer PRIVATE ${PROJECT_SOURCE_DIR}/include)
