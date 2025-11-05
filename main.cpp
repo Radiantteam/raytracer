@@ -27,8 +27,8 @@ std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int he
     // Fixed radius for all spheres
     const float radius = 150.0f;
 
-    // All spheres on horizontal line at vertical center
-    float centerY = height / 2.0f;
+    // All spheres on horizontal line at Y = 0
+    float centerY = 0.0f;
 
     // Calculate spacing between sphere centers (diameter + some gap)
     float spacingX = radius * 2.5f;  // 2.5 = 2 radii + 0.5 gap
@@ -73,14 +73,14 @@ int main()
 
     std::vector<std::unique_ptr<Shape>> scene = GenerateSpheres(sphereCount, width, height);
 
-    // Add the plane to the main scene
+    // Add the plane to the main scene (below the spheres)
     scene.push_back(std::make_unique<Plane>(
-        Vec3(0, height * 0.9f, 0),
+        Vec3(0, 300.0f, 0),
         Vec3(0, -1, 0),
         0.5f));
 
-    // Configuration caméra
-    Vec3 camOrigin = {width / 2.0f, height / 2.0f, -1500.0f};
+    // Configuration caméra (at Y = 0, same level as spheres)
+    Vec3 camOrigin = {width / 2.0f, 0.0f, -2500.0f};
 
     // Field of View - Ajuste entre 40° (peu de déformation) et 70° (vue plus large)
     float fovDegrees = 50.0f;

@@ -7,6 +7,30 @@ Ray::Ray(const Vec3& origin, const Vec3& direction)
     : _origin(origin), _direction(direction) {
 }
 
+// Shadow ray function: checks if a point is in shadow by casting a ray to the light
+static bool IsInShadow(const Vec3& point, const Vec3& lightPos, const std::vector<std::unique_ptr<Shape>>& scene) {
+    // Calculate direction and distance to light
+    Vec3 toLight = lightPos - point;
+    float distanceToLight = length(toLight);
+    Vec3 lightDir = normalize(toLight);
+
+    // Cast shadow ray from point toward light (with small offset to avoid self-intersection)
+    Vec3 shadowRayOrigin = point + lightDir * 1e-3f;
+
+    // Check if any object blocks the light
+    for (const auto& shape : scene) {
+        float t;
+        if (shape->Intersect(shadowRayOrigin, lightDir, t)) {
+            // If we hit something before reaching the light, we're in shadow
+            if (t > 0.0f && t < distanceToLight) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 Color Ray::TraceScene(const std::vector<std::unique_ptr<Shape>>& scene, int depth) const {
     if (depth <= 0) return Color(0,0,0);
 
@@ -47,6 +71,20 @@ Color Ray::TraceScene(const std::vector<std::unique_ptr<Shape>>& scene, int dept
             int check = (static_cast<int>(std::floor(hitPoint.x * scale)) + static_cast<int>(std::floor(hitPoint.z * scale))) & 1;
             Color surfaceColor = check ? Color(1.0f, 1.0f, 1.0f) : Color(0.2f, 0.2f, 0.2f);
 
+            // Shadow calculation: light positioned directly above for vertical shadows
+            // Same x and z as hitPoint creates perfectly vertical shadow rays
+            // Light at Y = -500 (above spheres at Y = 0)
+            Vec3 lightPos = Vec3(hitPoint.x, -500.0f, hitPoint.z);
+
+            // Cast shadow ray and darken surface if in shadow
+            float shadowFactor = 1.0f;
+            if (IsInShadow(hitPoint, lightPos, scene)) {
+                shadowFactor = 0.15f;  // Darken to 15% brightness in shadow
+            }
+
+            // Apply shadow before reflection
+            surfaceColor = surfaceColor * shadowFactor;
+
             float reflectivity = hit_plane->reflectivity;
             if (reflectivity > 0.0f) {
                 Vec3 normal = hit_plane->normal;
@@ -60,5 +98,5 @@ Color Ray::TraceScene(const std::vector<std::unique_ptr<Shape>>& scene, int dept
     }
 
     // Sinon retourner couleur de fond (transparente, sera ignorée)
-    return Color(0.53f, 0.81f, 0.92f);
+    return Color(0.88f, 0.88f, 0.88f);;
 }
