@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <cmath>
 
 #include "Color.hpp"
 #include "Ray.hpp"
@@ -10,42 +11,14 @@
 #include "src/cube/Cube.hpp"
 #include "../Shape.hpp"
 #include "src/vec/Vec3.hpp"
-
-#include <random>
-
-std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int height)
-{
-    std::vector<std::unique_ptr<Shape>> spheres;
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> distX(width * 0.1f, width * 0.9f);
-    std::uniform_real_distribution<float> distY(height * 0.3f, height * 0.3f);
-    std::uniform_real_distribution<float> distR(40.0f, 180.0f); // rayon
-    std::uniform_real_distribution<float> distC(0.2f, 1.0f);    // couleur RGB
-    std::uniform_real_distribution<float> distZ(-200.0f, 200.0f); // jeu de profondeur
-
-
-    for (int i = 0; i < count; ++i)
-    {
-        float x = distX(gen);
-        float y = distY(gen);
-        float radius = distR(gen);
-
-        Color color(distC(gen), distC(gen), distC(gen));
-        spheres.push_back(std::make_unique<Sphere>(Vec3{x, y, 0}, radius, color));
-    }
-
-    return spheres;
-}
+#include "src/generator/SphereGenerator.hpp"
 
 int main()
 {
-    const int width = 3920;
-    const int height = 2080;
+    const int width = 3840;
+    const int height = 2160;
 
-    // fond sombre par défaut
-    Image image(width, height, Color(0.1f, 0.1f, 0.12f));
+    Image image(width, height);
 
     int sphereCount;
     std::cout << "Combien de sphères veux-tu générer ? ";
@@ -57,40 +30,56 @@ int main()
         return 0;
     }
 
+    std::vector<std::unique_ptr<Shape>> scene = SphereGenerator::Generate(sphereCount, width, height);
 
-        // crée les sphères
-    std::vector<std::unique_ptr<Shape>> scene = GenerateSpheres(sphereCount, width, height);
+    // Add the plane to the main scene (below the spheres)
+    scene.push_back(std::make_unique<Plane>(
+        Vec3(0, 300.0f, 0),
+        Vec3(0, -1, 0),
+        0.5f));
 
+    // Configuration caméra (at Y = 0, same level as spheres)
+    Vec3 camOrigin = {width / 2.0f, 0.0f, -2500.0f};
 
-    // scene.push_back(std::make_unique<Cube>(
-    //     Vec3(width * 0.8f, height * 0.5f, 0),
-    //     200.0f,
-    //     Color(0.2f, 0.85f, 0.2f)));
+    // Field of View - Ajuste entre 40° (peu de déformation) et 70° (vue plus large)
+    float fovDegrees = 50.0f;
+    float aspectRatio = (float)width / (float)height;
 
-    Plane sol(
-        Vec3{0.0f, -0.5f, 0.0f}, // un point du plan (y négatif → “sol”)
-        Vec3{0.0f, 1.0f, 0.0f},  // normale vers le haut
-        Color(0.8f, 0.7f, 0.4f));
+    // Calcul de la hauteur du plan image à distance 1.0
+    float viewportHeight = 2.0f * std::tan((fovDegrees * M_PI / 180.0f) / 2.0f);
+    float viewportWidth = viewportHeight * aspectRatio;
 
-    Plane::Draw(image, sol);
+    // Vecteurs de la caméra (regardant vers +Z)
+    Vec3 w = normalize(Vec3(0, 0, 1));  // Direction avant (vers la scène)
+    Vec3 u = normalize(Vec3(1, 0, 0));  // Direction droite
+    Vec3 v = normalize(Vec3(0, 1, 0));  // Direction haut (CORRIGÉ: positif au lieu de négatif)
 
+    // Coin inférieur gauche du plan image virtuel
+    Vec3 horizontal = u * viewportWidth;
+    Vec3 vertical = v * viewportHeight;
+    Vec3 lowerLeftCorner = camOrigin + w - horizontal * 0.5f - vertical * 0.5f;
 
-    // camera au point d'origine, screen plane at z = 1
-    Vec3 camera{0.0f, 0.0f, 0.0f};
+    std::cout << "Rendu avec FOV: " << fovDegrees << "°" << std::endl;
 
-    // Simple raytracing : un rayon par colonne, du haut vers le bas
-    for (int y = 0; y < height; ++y)
+    // Raytracing avec projection perspective uniforme
+    for (int j = 0; j < height; ++j)
     {
-        for (int x = 0; x < width; ++x)
+        for (int i = 0; i < width; ++i)
         {
-            Ray ray(Vec3(x, y, 500.0f), Vec3(0, 0, -1));
+            // Coordonnées normalisées [0, 1]
+            float u_coord = (float)i / (float)(width - 1);
+            float v_coord = (float)j / (float)(height - 1);
+
+            // Point sur le plan image virtuel
+            Vec3 pixelPos = lowerLeftCorner + horizontal * u_coord + vertical * v_coord;
+
+            // Direction du rayon (normalisée)
+            Vec3 rayDir = normalize(pixelPos - camOrigin);
+
+            Ray ray(camOrigin, rayDir);
             Color pixelColor = ray.TraceScene(scene);
 
-            // Ne dessiner que si une forme est touchée (couleur non-noire)
-            if (pixelColor.R() > 0.0f || pixelColor.G() > 0.0f || pixelColor.B() > 0.0f)
-            {
-                image.SetPixel(x, y, pixelColor);
-            }
+            image.SetPixel(i, j, pixelColor);
         }
     }
 

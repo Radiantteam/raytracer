@@ -7,8 +7,8 @@
 class Image
 {
 private:
-    unsigned int width = 0;
-    unsigned int height = 0;
+    unsigned int width = 1920;
+    unsigned int height = 1080;
     std::vector<Color> buffer;
 public:
     Image(unsigned int w, unsigned int h);

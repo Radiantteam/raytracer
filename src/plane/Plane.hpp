@@ -1,21 +1,23 @@
 #pragma once
 
+#include <vector>
+#include <memory>
 #include "../vec/Vec3.hpp"
 #include "../color/Color.hpp"
 #include "../image/Image.hpp"
+#include "../Shape.hpp"
 
-class Plane {
+class Plane : public Shape {
 public:
     Vec3 point;   // Un point sur le plan
     Vec3 normal;  // Normale (doit être normalisée)
-    Color baseColor;
+    float reflectivity;
 
-    Plane(const Vec3& p, const Vec3& n, const Color& c)
-        : point(p), normal(normalize(n)), baseColor(c) {}
+    Plane(const Vec3& p, const Vec3& n, float reflect = 0.0f)
+        : point(p), normal(normalize(n)), reflectivity(reflect) {}
 
-    // Renvoie la distance t de l'intersection ray/plan, ou -1 si aucun hit
-    float Intersect(const Vec3& rayOrigin, const Vec3& rayDir) const;
+    bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
 
-    // Dessine le plan dans l’image (simple vue orthographique)
-    static void Draw(Image& img, const Plane& plane);
+    // The Draw method is now part of the Shape interface, but not used for raytracing
+    void Draw(Image& img) const override;
 };

@@ -24,6 +24,9 @@ public:
     Color operator+(Color const& col) const {
         return Color(clamp01(r + col.r), clamp01(g + col.g), clamp01(b + col.b));
     }
+    Color operator*(float scalar) const {
+        return Color(clamp01(r * scalar), clamp01(g * scalar), clamp01(b * scalar));
+    }
     Color& operator=(Color const& col) = default;
 
     friend std::ostream& operator<<(std::ostream& os, Color const& c) {

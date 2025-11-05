@@ -15,6 +15,8 @@ add_executable(raytracer main.cpp
         src/plane/Plane.hpp
         src/ray/Ray.hpp
         src/ray/Ray.cpp
+        src/generator/SphereGenerator.cpp
+        src/generator/SphereGenerator.hpp
 )
 
 
@@ -26,6 +28,7 @@ target_include_directories(raytracer PUBLIC
         "src/image"
         "src/lodepng"
         "src/ray"
+        "src/generator"
 )
 
 add_subdirectory(src/color)

@@ -8,8 +8,8 @@
  */
 static inline float clamp01(float v) { return std::max(0.0f, std::min(1.0f, v)); }
 
-Sphere::Sphere(const Vec3& center, float radius, const Color& color)
-    : _center(center), _radius(radius), _color(color) {
+Sphere::Sphere(const Vec3& center, float radius, const Color& color, float reflectivity)
+    : _center(center), _radius(radius), _color(color), _reflectivity(reflectivity) {
 }
 
 void Sphere::Draw(Image& img) const {
@@ -21,7 +21,7 @@ void Sphere::Draw(Image& img) const {
     const float radius = _radius;
 
     // ambient → quantité minimale de lumière présente même dans l’ombre
-    const float ambient = 0.12f;
+    const float ambient = 0.3f;
 
     // direction de la lumière, normalisé pour obtenir un calcul de lumière cohérent
     // const Vec3 lightDir = normalize(Vec3{0.0f, 0.0f, 1.0f});

@@ -27,7 +27,7 @@ public:
    * @param scene Liste des formes présentes dans la scène
    * @return Couleur du pixel résultant du lancer de rayon
    */
-  Color TraceScene(const std::vector<std::unique_ptr<Shape>>& scene) const;
+  Color TraceScene(const std::vector<std::unique_ptr<Shape>>& scene, int depth = 5) const;
 
   /**
    * Retourne le point d'origine du rayon.
