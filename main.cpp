@@ -10,8 +10,8 @@
 #include "src/plane/Plane.hpp"
 #include "src/cube/Cube.hpp"
 #include "../Shape.hpp"
-#include "anti_aliasing/AntiAliasing.h"
-#include "progress_bar/ProgressBar.h"
+#include "src/anti_aliasing/AntiAliasing.h"
+#include "src/progress_bar/ProgressBar.h"
 #include "src/vec/Vec3.hpp"
 #include "src/generator/SphereGenerator.hpp"
 
@@ -49,17 +49,6 @@ int main()
     const int height = 2160;
 
     Image image(width, height);
-
-
-    // Configuration de l'anti-aliasing (Random Jitter par défaut)
-    const AntiAliasing anti_aliasing(4);
-    AntiAliasing::InitRandom();
-
-    // Init barre de progression
-    ProgressBar progress(height);
-
-    // Fond ciel bleu par défaut
-    Image image(width, height, Color(0.155f, 0.0f, 0.0f));
 
     // Configuration de l'anti-aliasing (Random Jitter par défaut)
     const AntiAliasing anti_aliasing(4);
@@ -131,7 +120,9 @@ int main()
         }
     }
 
-    std::cout << "Wrote test.png with " << aa.GetSamplesPerPixel() << " samples/pixel (Random Jitter)\n";
+
+    image.WriteFile("test.png");
+    std::cout << "Wrote test.png with " << anti_aliasing.GetSamplesPerPixel() << " samples/pixel (Random Jitter)\n";
 
     return 0;
 }

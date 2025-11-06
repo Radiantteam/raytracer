@@ -32,8 +32,10 @@ target_include_directories(raytracer PUBLIC
         "src/image"
         "src/lodepng"
         "src/ray"
-        "src/generator"
+        "src/generator" # Add this line
 )
+
+target_compile_definitions(raytracer PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
 
 add_subdirectory(src/color)
 add_subdirectory(src/image)
