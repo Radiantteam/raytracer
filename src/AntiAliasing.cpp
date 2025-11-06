@@ -1,5 +1,9 @@
 #include "../include/AntiAliasing.hpp"
-#include "ray/Ray.hpp"
+
+#include "Color.hpp"
+#include "Ray.hpp"
+#include "Shape.hpp"
+#include "Vec3.hpp"
 
 AntiAliasing::AntiAliasing(int samplesPerAxis)
     : samplesPerAxis_(samplesPerAxis)
