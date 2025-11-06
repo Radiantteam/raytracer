@@ -1,6 +1,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <thread> // <-- 1. ADDED: Include for multithreading
 
 #include "Color.hpp"
 #include "Ray.hpp"
@@ -58,27 +59,63 @@ void render_scene(int width, int height, const char *outputFile)
 
     std::cout << "Rendu avec FOV: " << fovDegrees << "°" << std::endl;
 
-    // Raytracing avec projection perspective uniforme
-    for (int j = 0; j < height; ++j)
+
+    // ----- 2. REPLACED: Original loop is now multithreaded -----
+
+    // Get number of available threads
+    unsigned int numThreads = std::thread::hardware_concurrency();
+    if (numThreads == 0) numThreads = 2; // Fallback
+    std::cout << "Rendu avec " << numThreads << " threads." << std::endl;
+
+    std::vector<std::thread> threads;
+    int chunkHeight = height / numThreads;
+
+    // This lambda function contains the exact logic from your original loop
+    // 
+    auto renderChunk = [&](int j_start, int j_end)
     {
-        for (int i = 0; i < width; ++i)
+        // Raytracing avec projection perspective uniforme
+        for (int j = j_start; j < j_end; ++j) // Each thread works on a subset of 'j'
         {
-            // Coordonnées normalisées [0, 1]
-            float u_coord = (float)i / (float)(width - 1);
-            float v_coord = (float)j / (float)(height - 1);
+            for (int i = 0; i < width; ++i)
+            {
+                // Coordonnées normalisées [0, 1]
+                float u_coord = (float)i / (float)(width - 1);
+                float v_coord = (float)j / (float)(height - 1);
 
-            // Point sur le plan image virtuel
-            Vec3 pixelPos = lowerLeftCorner + horizontal * u_coord + vertical * v_coord;
+                // Point sur le plan image virtuel
+                Vec3 pixelPos = lowerLeftCorner + horizontal * u_coord + vertical * v_coord;
 
-            // Direction du rayon (normalisée)
-            Vec3 rayDir = normalize(pixelPos - camOrigin);
+                // Direction du rayon (normalisée)
+                Vec3 rayDir = normalize(pixelPos - camOrigin);
 
-            Ray ray(camOrigin, rayDir);
-            Color pixelColor = ray.TraceScene(scene);
+                Ray ray(camOrigin, rayDir);
+                Color pixelColor = ray.TraceScene(scene);
 
-            image.SetPixel(i, j, pixelColor);
+                // SetPixel is thread-safe here because no two threads
+                // will ever write to the same 'j' row.
+                image.SetPixel(i, j, pixelColor);
+            }
         }
+    };
+
+    // Launch threads
+    for (int t = 0; t < numThreads; ++t)
+    {
+        int j_start = t * chunkHeight;
+        // Ensure the last thread covers all remaining rows
+        int j_end = (t == numThreads - 1) ? height : (t + 1) * chunkHeight;
+
+        threads.emplace_back(renderChunk, j_start, j_end);
     }
+
+    // Wait for all threads to finish
+    for (auto& t : threads)
+    {
+        t.join();
+    }
+    // ----- END of threading changes -----
+
 
     image.WriteFile("test.png");
 }
