@@ -9,6 +9,8 @@ add_library(raytracer_lib STATIC
         Plane.cpp
         Renderer.cpp
         SphereGenerator.cpp
+        AntiAliasing.cpp
+        ProgressBar.cpp
 )
 
 target_include_directories(raytracer_lib

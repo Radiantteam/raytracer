@@ -25,9 +25,9 @@ private:
     static constexpr float SPHERE_RADIUS = 150.0f;
     static constexpr float SPHERE_Y_POSITION = 0.0f;
     static constexpr float SPACING_MULTIPLIER = 2.5f;
-    static constexpr float MIN_COLOR_VALUE = 0.2f;
+    static constexpr float MIN_COLOR_VALUE = 0.3f;   // Increased for more saturated metallic colors
     static constexpr float MAX_COLOR_VALUE = 1.0f;
     static constexpr float MIN_Z_DEPTH = -400.0f;
     static constexpr float MAX_Z_DEPTH = 400.0f;
-    static constexpr float SPHERE_REFLECTIVITY = 0.8f;
+    static constexpr float SPHERE_REFLECTIVITY = 0.0f;  // Increased for more mirror-like metallic surfaces
 };
