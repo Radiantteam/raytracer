@@ -19,9 +19,3 @@ bool Plane::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
     }
     return false;
 }
-
-void Plane::Draw(Image& /*img*/) const
-{
-    // This method is no longer needed for raytracing.
-    // It's part of the Shape interface, so we provide an empty implementation.
-}

@@ -11,8 +11,6 @@ class Cube : public Shape
 public:
     Cube(const Vec3 &center, float size, const Color &color);
 
-    void Draw(Image &img) const override;
-
     bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
 
 private:
