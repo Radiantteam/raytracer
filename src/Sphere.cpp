@@ -2,12 +2,6 @@
 #include <algorithm>
 #include <cmath>
 
-/**
- * Assure qu’une valeur reste dans l’intervalle [0…1]
- * Permet d'éviter que les composantes de couleur deviennent négatives ou supérieures à 1
- */
-static inline float clamp01(float v) { return std::max(0.0f, std::min(1.0f, v)); }
-
 Sphere::Sphere(const Vec3& center, float radius, const Color& color, float reflectivity)
     : _center(center), _radius(radius), _color(color), _reflectivity(reflectivity) {
 }
