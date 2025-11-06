@@ -12,6 +12,8 @@ public:
 
     bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
 
+    void Draw(Image& img) const ;
+
     const Color& GetColor() const { return _color; }
     Color GetShadedColor(const Vec3& hitPoint) const;
     const Vec3& GetCenter() const { return _center; }
