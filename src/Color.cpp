@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include "MathUtils.hpp"
 
 class Color {
 private:
@@ -7,13 +8,9 @@ private:
     float g = 0.0f;
     float b = 0.0f;
 
-    static inline float clamp01(float v) {
-        return std::max(0.0f, std::min(1.0f, v));
-    }
-
 public:
     Color() = default;
-    Color(float r_, float g_, float b_) : r(clamp01(r_)), g(clamp01(g_)), b(clamp01(b_)) {}
+    Color(float r_, float g_, float b_) : r(MathUtils::clamp01(r_)), g(MathUtils::clamp01(g_)), b(MathUtils::clamp01(b_)) {}
     ~Color() = default;
 
     float R() const { return r; }
@@ -21,7 +18,7 @@ public:
     float B() const { return b; }
 
     Color operator+(Color const& col) const {
-        return Color(clamp01(r + col.r), clamp01(g + col.g), clamp01(b + col.b));
+        return Color(MathUtils::clamp01(r + col.r), MathUtils::clamp01(g + col.g), MathUtils::clamp01(b + col.b));
     }
     Color& operator=(Color const& col) = default;
 
