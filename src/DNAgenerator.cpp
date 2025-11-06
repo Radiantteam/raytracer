@@ -1,9 +1,9 @@
-#include "DNAgenerator.hpp"
 #include <iostream>
 #include <fstream>
 #include <cmath>
 #include <algorithm>
-#include "../../libs/json.hpp"
+#include "DNAgenerator.hpp"
+#include "json.hpp"
 
 using json = nlohmann::json;
 

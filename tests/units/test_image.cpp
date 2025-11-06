@@ -12,8 +12,9 @@ TEST_CASE("A PNG file is present")
 {
     const int width = 3920;
     const int height = 2080;
+    const float screenZ = 500.0f;
 
-    render_scene(width, height, "test.png");
+    render_scene(width, height, screenZ,"test.png");
 
     // check si un fichier PNG a été généré
     CHECK(fs::exists("test.png"));
@@ -23,9 +24,10 @@ TEST_CASE("Full image render time")
 {
     const int width = 3920;
     const int height = 2080;
+    const float screenZ = 500.0f;
 
     auto start = std::chrono::high_resolution_clock::now();
-    render_scene(width, height, "test.png");
+    render_scene(width, height, screenZ,"test.png");
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> duration = end - start;

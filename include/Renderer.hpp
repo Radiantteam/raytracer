@@ -10,4 +10,4 @@
 #include <memory>
 #include <vector>
 
-void render_scene(int width, int height, const char *outputFile);
+void render_scene(int width, int height, float screenZ, const char *outputFile);
