@@ -101,14 +101,39 @@ Color Sphere::GetShadedColor(const Vec3& hitPoint) const {
     // Lumière venant du haut : direction (0, -1, 0.3) normalisée
     Vec3 lightDir = normalize(Vec3(0.0f, -1.0f, 0.3f));
 
-    // Éclairage ambiant + diffus (Lambert)
-    const float ambient = 0.2f;
-    float diff = std::max(0.0f, dot(normal, lightDir));
-    float intensity = clamp01(ambient + 0.8f * diff);
+    // View direction (toward camera, assuming camera is far behind in -Z)
+    // For a more accurate view vector, this should come from the ray direction
+    Vec3 viewDir = normalize(Vec3(0.0f, 0.0f, -1.0f));
 
+    // === DIFFUSE (Lambert) ===
+    // Diffuse shading - how much surface faces the light
+    const float ambient = 0.15f;  // Reduced ambient for more dramatic metallic look
+    float diff = std::max(0.0f, dot(normal, lightDir));
+
+    // === SPECULAR (Blinn-Phong for metallic surfaces) ===
+    // Calculate halfway vector between light and view directions
+    Vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    // Specular intensity using Blinn-Phong model
+    // Higher shininess = tighter, more mirror-like highlight (typical for metals: 32-128)
+    const float shininess = 64.0f;  // Metallic surfaces have high shininess
+    float spec = std::pow(std::max(0.0f, dot(normal, halfwayDir)), shininess);
+
+    // Metals have strong specular highlights (0.6-0.9 typical)
+    const float specularStrength = 0.7f;
+
+    // === METALLIC COLOR MIXING ===
+    // For metals, the diffuse color is tinted and specular takes on the metal's color
+    // DO NOT clamp intermediate values - let Color constructor handle final clamping
+    // Premature clamping causes visible banding/posterization artifacts
+    float diffuseIntensity = ambient + 0.5f * diff;  // Reduced diffuse contribution
+    float specularIntensity = specularStrength * spec;
+
+    // Metals reflect their base color in specular highlights
+    // Color constructor will clamp to [0,1], preserving smooth gradients
     return Color(
-        clamp01(_color.R() * intensity),
-        clamp01(_color.G() * intensity),
-        clamp01(_color.B() * intensity)
+        _color.R() * diffuseIntensity + _color.R() * specularIntensity,
+        _color.G() * diffuseIntensity + _color.G() * specularIntensity,
+        _color.B() * diffuseIntensity + _color.B() * specularIntensity
     );
 }
