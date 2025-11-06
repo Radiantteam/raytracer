@@ -21,7 +21,7 @@
 #include "SceneLoader.hpp"
 #include "DNAgenerator.hpp"
 
-void render_scene(int width, int height, const char *outputFile)
+void render_scene(int width, int height, float screenZ, const char *outputFile)
 {
     ProgressBar progressBar(height);
     Image image(width, height);
