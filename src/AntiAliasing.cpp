@@ -1,5 +1,5 @@
-#include "AntiAliasing.hpp"
-#include "../ray/Ray.hpp"
+#include "../include/AntiAliasing.hpp"
+#include "ray/Ray.hpp"
 
 AntiAliasing::AntiAliasing(int samplesPerAxis)
     : samplesPerAxis_(samplesPerAxis)

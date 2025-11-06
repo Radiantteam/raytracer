@@ -3,9 +3,9 @@
 
 #include <vector>
 #include <memory>
-#include "../Shape.hpp"
-#include "../color/Color.hpp"
-#include "../vec/Vec3.hpp"
+#include "../src/Shape.hpp"
+#include "../src/color/Color.hpp"
+#include "../src/vec/Vec3.hpp"
 
 /**
  * @class AntiAliasing
