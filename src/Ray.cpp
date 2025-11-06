@@ -1,7 +1,7 @@
 #include "Ray.hpp"
-#include "../sphere/Sphere.hpp"
-#include "../plane/Plane.hpp"
-#include "../vec/Vec3.hpp"
+#include "Sphere.hpp"
+#include "Plane.hpp"
+#include "Vec3.hpp"
 
 Ray::Ray(const Vec3& origin, const Vec3& direction)
     : _origin(origin), _direction(direction) {

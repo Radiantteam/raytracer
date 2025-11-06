@@ -1,6 +1,6 @@
-#include "../include/Cube.hpp"
 #include <algorithm>
 #include <cmath>
+#include "Cube.hpp"
 
 /**
  * Assure qu’une valeur reste dans l’intervalle [0…1]

@@ -1,9 +1,9 @@
-#include "../include/Plane.hpp"
 #include <cmath>
 #include <algorithm>
 #include <limits>
-#include "../ray/Ray.hpp"
-#include "../sphere/Sphere.hpp"
+#include "Plane.hpp"
+#include "Ray.hpp"
+#include "Sphere.hpp"
 
 static inline float clamp01(float v) { return std::max(0.0f, std::min(1.0f, v)); }
 

@@ -1,4 +1,4 @@
-#include "../include/Sphere.hpp"
+#include "Sphere.hpp"
 #include <algorithm>
 #include <cmath>
 

@@ -8,6 +8,7 @@ add_library(raytracer_lib STATIC
         Cube.cpp
         Plane.cpp
         Renderer.cpp
+        SphereGenerator.cpp
 )
 
 target_include_directories(raytracer_lib

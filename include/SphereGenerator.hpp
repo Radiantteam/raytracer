@@ -2,10 +2,10 @@
 
 #include <vector>
 #include <memory>
-#include "../Shape.hpp"
-#include "../sphere/Sphere.hpp"
-#include "../color/Color.hpp"
-#include "../vec/Vec3.hpp"
+#include "Shape.hpp"
+#include "Sphere.hpp"
+#include "Color.hpp"
+#include "Vec3.hpp"
 
 /**
  * Class responsible for generating spheres in the scene
