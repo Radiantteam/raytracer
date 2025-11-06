@@ -1,1 +1,0 @@
-add_library(ray STATIC Ray.cpp)

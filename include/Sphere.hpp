@@ -1,16 +1,17 @@
 #pragma once
 
-#include "../Shape.hpp"
-#include "../vec/Vec3.hpp"
-#include "image/Image.hpp"
+#include "Shape.hpp"
+#include "Vec3.hpp"
+#include "Image.hpp"
 
 // Dessine une sphère centrée (cx, cy), rayon en pixels, teintée par baseColor.
 // Éclairage minimal : ambiant + Lambert
-class Sphere : public Shape {
+class Sphere : public Shape
+{
 public:
     Sphere(const Vec3& center, float radius, const Color& color, float reflectivity = 0.0f);
 
-    void Draw(Image& img) const override;
+    void Draw(Image &img) const override;
 
     bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
 
