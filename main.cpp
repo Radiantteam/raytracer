@@ -37,7 +37,9 @@ std::vector<std::unique_ptr<Shape>> GenerateSpheres(int count, int width, int he
         float radius = distR(gen);
 
         Color color(distC(gen), distC(gen), distC(gen));
-        spheres.push_back(std::make_unique<Sphere>(Vec3{x, y, 0}, radius, color));
+        auto sphere = std::make_unique<Sphere>(Vec3{x, y, distZ(gen)}, radius, color);
+        sphere->RandomizeTexture();  // Génère type (gradient, marble, etc.) + reflectivity random
+        spheres.push_back(std::move(sphere));
     }
 
     return spheres;

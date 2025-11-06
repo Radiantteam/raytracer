@@ -1,15 +1,31 @@
 #include "Sphere.hpp"
 #include <algorithm>
 #include <cmath>
+#include <random>
 
 /**
  * Assure qu’une valeur reste dans l’intervalle [0…1]
  * Permet d'éviter que les composantes de couleur deviennent négatives ou supérieures à 1
  */
+ 
 static inline float clamp01(float v) { return std::max(0.0f, std::min(1.0f, v)); }
 
 Sphere::Sphere(const Vec3& center, float radius, const Color& color, float reflectivity)
     : _center(center), _radius(radius), _color(color), _reflectivity(reflectivity) {
+    RandomizeTexture();
+}
+
+void Sphere::RandomizeTexture()
+{
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> typeDist(0, 3);
+    std::uniform_real_distribution<float> reflDist(0.0f, 0.6f);
+    std::uniform_real_distribution<float> seedDist(0.0f, 1000.0f);
+
+    _textureType = static_cast<TextureType>(typeDist(gen));
+    _reflectivity = reflDist(gen);
+    _textureSeed = seedDist(gen);
 }
 
 // Ray-sphere intersection implementation.
@@ -47,9 +63,54 @@ Color Sphere::GetShadedColor(const Vec3& hitPoint) const {
     Vec3 lightDir = normalize(Vec3(0.0f, -1.0f, 0.3f));
 
     // Éclairage ambiant + diffus (Lambert)
-    const float ambient = 0.2f;
+    const float ambient = 0.25f;
     float diff = std::max(0.0f, dot(normal, lightDir));
     float intensity = clamp01(ambient + 0.8f * diff);
+
+    Color base = _color;
+
+    switch (_textureType)
+{
+    case TextureType::Gradient:
+    {
+        float h = (hitPoint.y - _center.y) / (_radius * 2.0f);
+        h = clamp01(h * 0.5f + 0.5f);
+        base = Color(
+            _color.R() * (0.3f + 0.7f * h),
+            _color.G() * (0.3f + 0.7f * h),
+            _color.B() * (0.3f + 0.7f * h)
+        );
+        break;
+    }
+
+    case TextureType::Marble:
+    {
+        float n = std::sin(hitPoint.x * 0.05f + hitPoint.y * 0.07f + hitPoint.z * 0.03f + _textureSeed);
+        float veins = 0.5f + 0.5f * std::sin(n * 20.0f);
+        base = Color(
+            _color.R() * (0.4f + 0.6f * veins),
+            _color.G() * (0.4f + 0.6f * veins),
+            _color.B() * (0.4f + 0.6f * veins)
+        );
+        break;
+    }
+
+    case TextureType::Noise:
+    {
+        float noise = std::sin((hitPoint.x * 0.2f + hitPoint.z * 0.3f + _textureSeed) * 3.5f);
+        float pattern = 0.5f + 0.5f * noise;
+        base = Color(
+            _color.R() * (0.5f + 0.5f * pattern),
+            _color.G() * (0.5f + 0.5f * pattern),
+            _color.B() * (0.5f + 0.5f * pattern)
+        );
+        break;
+    }
+
+    default:
+        break;
+}
+
 
     return Color(
         clamp01(_color.R() * intensity),
