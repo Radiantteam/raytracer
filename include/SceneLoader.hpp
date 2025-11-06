@@ -86,20 +86,6 @@ public:
                     shape["size"],
                     Color(col[0], col[1], col[2])));
             }
-            // else if (type == "plane")
-            // {
-            //     auto pos = shape["position"];
-            //     auto norm = shape["normal"];
-            //     auto col = shape["color"];
-            //     float reflectivity = shape.contains("reflectivity")
-            //         ? shape["reflectivity"].get<float>()
-            //         : 0.0f;
-            //
-            //     scene.shapes.push_back(std::make_unique<Plane>(
-            //         Vec3{pos[0], pos[1], pos[2]},
-            //         Vec3{norm[0], norm[1], norm[2]},
-            //         reflectivity));
-            // }
             else {
                 std::cerr << "Warning: Unknown shape type \"" << type << "\" in scene\n";
             }
