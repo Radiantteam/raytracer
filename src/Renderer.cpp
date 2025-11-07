@@ -4,6 +4,7 @@
 #include <thread> // <-- 1. ADDED: Include for multithreading
 #include <filesystem>
 #include <random>
+#include <iostream>
 
 #include "json.hpp"
 #include "Color.hpp"
@@ -20,6 +21,7 @@
 #include "Shape.hpp"
 #include "SceneLoader.hpp"
 #include "DNAgenerator.hpp"
+#include "../include/Timer.hpp"
 
 void render_scene(int width, int height, float screenZ, const char *outputFile)
 {
@@ -125,6 +127,9 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
     // samplesPerAxis = 8 → 64 rays/pixel (8x8 grid)  - Ultra quality, very slow
     AntiAliasing antiAliasing(4);
 
+        // ==================== Timer ====================
+    Timer renderTimer;
+
 
     // ----- 2. REPLACED: Original loop is now multithreaded -----
 
@@ -176,6 +181,8 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
     // ----- END of threading changes -----
 
     image.WriteFile("test.png");
+
+    renderTimer.PrintElapsed("Temps de rendu");
 }
 
     catch (const std::exception &e)

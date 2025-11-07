@@ -12,6 +12,7 @@ add_library(raytracer_lib STATIC
         DNAgenerator.cpp
         AntiAliasing.cpp
         ProgressBar.cpp
+        Timer.cpp
 )
 
 target_include_directories(raytracer_lib
