@@ -11,6 +11,8 @@ std::vector<std::unique_ptr<Shape>> SphereGenerator::Generate(int count, int wid
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distC(MIN_COLOR_VALUE, MAX_COLOR_VALUE);
+    std::uniform_real_distribution<float> distZ(MIN_Z_DEPTH, MAX_Z_DEPTH);
+    std::uniform_real_distribution<float> distReflect(0.0f, 0.8f);
 
     // Calculate spacing between sphere centers (diameter + some gap)
     float spacingX = SPHERE_RADIUS * SPACING_MULTIPLIER;
@@ -21,20 +23,20 @@ std::vector<std::unique_ptr<Shape>> SphereGenerator::Generate(int count, int wid
     // Center the horizontal line
     float startX = (width - totalWidth) / 2.0f;
 
-    // Random Z distribution for depth variation
-    std::uniform_real_distribution<float> distZ(MIN_Z_DEPTH, MAX_Z_DEPTH);
-
     for (int i = 0; i < count; ++i) {
         float x = startX + i * spacingX;
         float z = distZ(gen);
 
         Color color(distC(gen), distC(gen), distC(gen));
-        spheres.push_back(std::make_unique<Sphere>(
+        
+        auto sphere = std::make_unique<Sphere>(
             Vec3{x, SPHERE_Y_POSITION, z},
             SPHERE_RADIUS,
             color,
-            SPHERE_REFLECTIVITY
-        ));
+            distReflect(gen)
+        );
+        sphere->RandomizeTexture();
+        spheres.push_back(std::move(sphere));
     }
 
     return spheres;

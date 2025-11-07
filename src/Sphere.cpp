@@ -1,10 +1,13 @@
 #include "../include/Sphere.hpp"
 #include <algorithm>
 #include <cmath>
+#include "MathUtils.hpp"
+#include <random>
 
 Sphere::Sphere(const Vec3& center, float radius, const Color& color, float reflectivity)
     : _center(center), _radius(radius), _color(color), _reflectivity(reflectivity) {
 }
+
 
 // Ray-sphere intersection implementation.
 // Solves: || o + t*d - center ||^2 = r^2, with d assumed normalized.
@@ -33,46 +36,67 @@ bool Sphere::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
     return true;
 }
 
+
 Color Sphere::GetShadedColor(const Vec3& hitPoint) const {
-    // Calculer la normale au point d'intersection
     Vec3 normal = normalize(hitPoint - _center);
-
-    // Lumière venant du haut : direction (0, -1, 0.3) normalisée
     Vec3 lightDir = normalize(Vec3(0.0f, -1.0f, 0.3f));
-
-    // View direction (toward camera, assuming camera is far behind in -Z)
-    // For a more accurate view vector, this should come from the ray direction
     Vec3 viewDir = normalize(Vec3(0.0f, 0.0f, -1.0f));
 
-    // === DIFFUSE (Lambert) ===
-    // Diffuse shading - how much surface faces the light
-    const float ambient = 0.15f;  // Reduced ambient for more dramatic metallic look
+    // === BASE LIGHTING ===
+    const float ambient = 0.15f;
     float diff = std::max(0.0f, dot(normal, lightDir));
-
-    // === SPECULAR (Blinn-Phong for metallic surfaces) ===
-    // Calculate halfway vector between light and view directions
     Vec3 halfwayDir = normalize(lightDir + viewDir);
-
-    // Specular intensity using Blinn-Phong model
-    // Higher shininess = tighter, more mirror-like highlight (typical for metals: 32-128)
-    const float shininess = 64.0f;  // Metallic surfaces have high shininess
+    const float shininess = 64.0f;
     float spec = std::pow(std::max(0.0f, dot(normal, halfwayDir)), shininess);
-
-    // Metals have strong specular highlights (0.6-0.9 typical)
     const float specularStrength = 0.7f;
 
-    // === METALLIC COLOR MIXING ===
-    // For metals, the diffuse color is tinted and specular takes on the metal's color
-    // DO NOT clamp intermediate values - let Color constructor handle final clamping
-    // Premature clamping causes visible banding/posterization artifacts
-    float diffuseIntensity = ambient + 0.5f * diff;  // Reduced diffuse contribution
+    // === TEXTURE SELECTION ===
+    float pattern = 1.0f;
+    Vec3 local = hitPoint * 0.02f + Vec3(_textureSeed * 0.001f);
+
+    switch (_textureType)
+{
+    case TextureType::Gradient:
+        // dégradé vertical + contraste
+        pattern = MathUtils::clamp01(0.3f + 0.7f * normal.y);
+        break;
+
+    case TextureType::Marble:
+        // marbre 
+        pattern = 0.5f + 0.5f * std::sin(local.x * 6.0f + std::sin(local.y * 4.0f) * 3.0f + _textureSeed);
+        pattern = std::pow(pattern, 1.4f); 
+        break;
+
+    case TextureType::Noise:
+        
+        pattern = std::fabs(std::sin(local.x * 4.5f + std::cos(local.z * 3.7f) + local.y * 1.5f + _textureSeed));
+        pattern = std::pow(pattern, 0.6f); 
+        break;
+}
+
+    // === APPLY TEXTURE TO BASE COLOR ===
+    float r = _color.R() * pattern;
+    float g = _color.G() * pattern;
+    float b = _color.B() * pattern;
+
+    // === COMBINE LIGHTING ===
+    float diffuseIntensity = ambient + 0.5f * diff;
     float specularIntensity = specularStrength * spec;
 
-    // Metals reflect their base color in specular highlights
-    // Color constructor will clamp to [0,1], preserving smooth gradients
     return Color(
-        _color.R() * diffuseIntensity + _color.R() * specularIntensity,
-        _color.G() * diffuseIntensity + _color.G() * specularIntensity,
-        _color.B() * diffuseIntensity + _color.B() * specularIntensity
+        MathUtils::clamp01(r * diffuseIntensity + _color.R() * specularIntensity),
+        MathUtils::clamp01(g * diffuseIntensity + _color.G() * specularIntensity),
+        MathUtils::clamp01(b * diffuseIntensity + _color.B() * specularIntensity)
     );
+}
+
+void Sphere::RandomizeTexture() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distType(0, 2);
+    std::uniform_real_distribution<float> distReflect(0.0f, 0.8f);
+
+    _textureType = static_cast<TextureType>(distType(gen));
+    _reflectivity = distReflect(gen);
+    _textureSeed = static_cast<float>(rd() % 10000);
 }

@@ -9,6 +9,8 @@
 class Sphere : public Shape
 {
 public:
+    void RandomizeTexture();
+
     Sphere(const Vec3& center, float radius, const Color& color, float reflectivity = 0.0f);
 
     bool Intersect(const Vec3 &o, const Vec3 &d, float &out_t) override;
@@ -18,6 +20,11 @@ public:
     const Vec3& GetCenter() const { return _center; }
     float GetReflectivity() const { return _reflectivity; }
 private:
+    enum class TextureType { Gradient, Marble, Noise };
+
+    TextureType _textureType = TextureType::Gradient;
+    float _textureSeed = 0.0f;
+
     Vec3 _center;
     float _radius;
     Color _color;

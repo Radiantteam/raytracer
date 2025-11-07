@@ -9,6 +9,8 @@ private:
     float g = 0.0f;
     float b = 0.0f;
 
+    Color(float v) : r(MathUtils::clamp01(v)), g(MathUtils::clamp01(v)), b(MathUtils::clamp01(v)) {}
+
 public:
     Color() = default;
     Color(float r_, float g_, float b_) : r(MathUtils::clamp01(r_)), g(MathUtils::clamp01(g_)), b(MathUtils::clamp01(b_)) {}
