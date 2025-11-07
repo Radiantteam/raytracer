@@ -14,7 +14,8 @@ std::vector<std::unique_ptr<Shape>> ShapeGenerator::Generate(int count, int widt
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> distC(MIN_COLOR_VALUE, MAX_COLOR_VALUE);
-    std::uniform_int_distribution<int> shapeType(0, 1); // 0 = sphere, 1 = cube
+    // Distribution pondérée : 0-7 = sphère (80%), 8-9 = cube (20%)
+    std::uniform_int_distribution<int> shapeType(0, 9);
     std::uniform_real_distribution<float> distReflect(0.0f, 0.8f);
 
     // Calculate spacing between shape centers (diameter + some gap)
@@ -36,8 +37,7 @@ std::vector<std::unique_ptr<Shape>> ShapeGenerator::Generate(int count, int widt
 
         Color color(distC(gen), distC(gen), distC(gen));
 
-        // Randomly decide whether to create a sphere or cube
-        if (shapeType(gen) == 0)
+        if (shapeType(gen) < 7)
         {
             // Create sphere
             auto sphere = std::make_unique<Sphere>(

@@ -2,6 +2,6 @@
 
 int main()
 {
-    render_scene(1920, 1080, 500.0f, "image.png");
+    render_scene(3840, 2180, 500.0f, "image.png");
     std::cout << "Wrote image.png\n";
 }
