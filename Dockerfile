@@ -28,10 +28,13 @@
     FROM alpine:3.20 AS runner
     RUN apk add --no-cache libstdc++
     WORKDIR /output
-    
+
     COPY --from=builder /app/build/raytracer /usr/local/bin/raytracer
-    COPY --from=builder /app/scene_boules.json /output/../scene_boucles.json
+    COPY --from=builder /app/scene_boules.json /output/../scene_boules.json
     COPY --from=builder /app/scene_dna.json   /output/../scene_dna.json
-    
+
+    # Define volume for output files
+    VOLUME ["/output"]
+
     ENTRYPOINT ["raytracer"]
     
