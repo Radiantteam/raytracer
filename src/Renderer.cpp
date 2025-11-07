@@ -16,7 +16,6 @@
 #include "Vec3.hpp"
 #include "Renderer.hpp"
 #include "SphereGenerator.hpp"
-#include "ProgressBar.hpp"
 #include "AntiAliasing.hpp"
 #include "Shape.hpp"
 #include "SceneLoader.hpp"
@@ -24,7 +23,6 @@
 
 void render_scene(int width, int height, float screenZ, const char *outputFile)
 {
-    ProgressBar progressBar(height);
     Image image(width, height);
 
     std::vector<std::unique_ptr<Shape>> scene;
@@ -145,15 +143,13 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
         // Raytracing avec projection perspective uniforme
         for (int j = j_start; j < j_end; ++j) // Each thread works on a subset of 'j'
         {
-            progressBar.update(j);for (int i = 0; i < width; ++i)
+            for (int i = 0; i < width; ++i)
             {
                 Color pixelColor = antiAliasing.SamplePixel(
                 i, j, width, height,
                camOrigin, lowerLeftCorner, horizontal, vertical,
                scene
            );
-
-
 
                 // SetPixel is thread-safe here because no two threads
                 // will ever write to the same 'j' row.
@@ -186,6 +182,5 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
     {
         std::cerr << "Error: " << e.what() << "\n";
         std::cerr << "Working directory: " << std::filesystem::current_path() << "\n";
-        return;
     }
 }
