@@ -1,6 +1,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <thread> // <-- 1. ADDED: Include for multithreading
 #include <filesystem>
 #include <random>
 
@@ -15,7 +16,6 @@
 #include "Vec3.hpp"
 #include "Renderer.hpp"
 #include "SphereGenerator.hpp"
-#include "ProgressBar.hpp"
 #include "AntiAliasing.hpp"
 #include "Shape.hpp"
 #include "SceneLoader.hpp"
@@ -23,7 +23,6 @@
 
 void render_scene(int width, int height, float screenZ, const char *outputFile)
 {
-    ProgressBar progressBar(height);
     Image image(width, height);
 
     std::vector<std::unique_ptr<Shape>> scene;
@@ -126,24 +125,55 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
     // samplesPerAxis = 8 → 64 rays/pixel (8x8 grid)  - Ultra quality, very slow
     AntiAliasing antiAliasing(4);
 
-        // Raytracing avec projection perspective uniforme
-        for (int j = 0; j < height; ++j)
-            {
-                progressBar.update(j);
 
-                for (int i = 0; i < width; ++i)
+    // ----- 2. REPLACED: Original loop is now multithreaded -----
+
+    // Get number of available threads
+    unsigned int numThreads = std::thread::hardware_concurrency();
+    if (numThreads == 0) numThreads = 2; // Fallback
+    std::cout << "Rendu avec " << numThreads << " threads." << std::endl;
+
+    std::vector<std::thread> threads;
+    int chunkHeight = height / numThreads;
+
+    // This lambda function contains the exact logic from your original loop
+    //
+    auto renderChunk = [&](int j_start, int j_end)
+    {
+        // Raytracing avec projection perspective uniforme
+        for (int j = j_start; j < j_end; ++j) // Each thread works on a subset of 'j'
         {
+            for (int i = 0; i < width; ++i)
+            {
                 Color pixelColor = antiAliasing.SamplePixel(
-               i, j, width, height,
+                i, j, width, height,
                camOrigin, lowerLeftCorner, horizontal, vertical,
                scene
            );
 
-
-
+                // SetPixel is thread-safe here because no two threads
+                // will ever write to the same 'j' row.
                 image.SetPixel(i, j, pixelColor);
             }
         }
+    };
+
+    // Launch threads
+    for (int t = 0; t < numThreads; ++t)
+    {
+        int j_start = t * chunkHeight;
+        // Ensure the last thread covers all remaining rows
+        int j_end = (t == numThreads - 1) ? height : (t + 1) * chunkHeight;
+
+        threads.emplace_back(renderChunk, j_start, j_end);
+    }
+
+    // Wait for all threads to finish
+    for (auto& t : threads)
+    {
+        t.join();
+    }
+    // ----- END of threading changes -----
 
     image.WriteFile("test.png");
 }
@@ -152,6 +182,5 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
     {
         std::cerr << "Error: " << e.what() << "\n";
         std::cerr << "Working directory: " << std::filesystem::current_path() << "\n";
-        return;
     }
 }
