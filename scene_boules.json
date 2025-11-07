@@ -10,20 +10,20 @@
   },
   "shapes": [
     {
-      "type": "sphere",
-      "position": [300, 300, 0],
-      "radius": 150,
-      "color": [0.8, 0.3, 0.3]
+      "type": "cube",
+      "position": [300, 1, 0],
+      "size": 250,
+      "color": [1, 1, 0]
     },
     {
       "type": "sphere",
-      "position": [700, 300, -50],
+      "position": [700, 1, -50],
       "radius": 200,
       "color": [0.3, 0.8, 0.3]
     },
     {
       "type": "sphere",
-      "position": [1400, 300, 10],
+      "position": [1400, 1, 10],
       "radius": 120,
       "color": [0.9, 0.9, 0.9]
     }

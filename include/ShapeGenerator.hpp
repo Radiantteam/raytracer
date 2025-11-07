@@ -10,7 +10,7 @@
 /**
  * Class responsible for generating spheres in the scene
  */
-class SphereGenerator {
+class ShapeGenerator {
 public:
     /**
      * Generate a collection of spheres arranged horizontally
@@ -23,7 +23,8 @@ public:
 
 private:
     static constexpr float SPHERE_RADIUS = 150.0f;
-    static constexpr float SPHERE_Y_POSITION = 1.0f;
+    static constexpr float CUBE_SIZE = 150.0f;
+    static constexpr float Y_POSITION = 1.0f;
     static constexpr float SPACING_MULTIPLIER = 2.5f;
     static constexpr float MIN_COLOR_VALUE = 0.3f;   // Increased for more saturated metallic colors
     static constexpr float MAX_COLOR_VALUE = 1.0f;

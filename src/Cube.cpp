@@ -2,7 +2,7 @@
 #include <cmath>
 #include "Cube.hpp"
 
-Cube::Cube(const Vec3 &center, float size, const Color &color)
+Cube::Cube(const Vec3 &center, float size, const Color &color, float reflectivity)
     : _center(center), _size(size), _color(color)
 {
 }
@@ -52,4 +52,46 @@ bool Cube::Intersect(const Vec3 &o, const Vec3 &d, float &out_t)
 
     out_t = t_hit;
     return true;
+}
+
+Color Cube::GetShadedColor(const Vec3& hitPoint) const {
+    // === Compute surface normal based on which face was hit ===
+    Vec3 half = Vec3{_size / 2.0f, _size / 2.0f, _size / 2.0f};
+    Vec3 local = hitPoint - _center;
+
+    // Calculate distances from each face
+    float distX = half.x - std::abs(local.x);
+    float distY = half.y - std::abs(local.y);
+    float distZ = half.z - std::abs(local.z);
+
+    // The face with minimum distance is the one that was hit
+    Vec3 normal;
+    if (distX < distY && distX < distZ) {
+        normal = Vec3((local.x > 0) ? 1.0f : -1.0f, 0.0f, 0.0f);
+    } else if (distY < distZ) {
+        normal = Vec3(0.0f, (local.y > 0) ? 1.0f : -1.0f, 0.0f);
+    } else {
+        normal = Vec3(0.0f, 0.0f, (local.z > 0) ? 1.0f : -1.0f);
+    }
+
+    // === Same lighting model as Sphere ===
+    Vec3 lightDir = normalize(Vec3(0.0f, -1.0f, 0.3f));
+    Vec3 viewDir  = normalize(Vec3(0.0f, 0.0f, -1.0f));
+
+    const float ambient = 0.15f;
+    float diff = std::max(0.0f, dot(normal, lightDir));
+
+    Vec3 halfwayDir = normalize(lightDir + viewDir);
+    const float shininess = 64.0f;
+    float spec = std::pow(std::max(0.0f, dot(normal, halfwayDir)), shininess);
+    const float specularStrength = 0.7f;
+
+    float diffuseIntensity = ambient + 0.5f * diff;
+    float specularIntensity = specularStrength * spec;
+
+    return Color(
+        _color.R() * diffuseIntensity + _color.R() * specularIntensity,
+        _color.G() * diffuseIntensity + _color.G() * specularIntensity,
+        _color.B() * diffuseIntensity + _color.B() * specularIntensity
+    );
 }

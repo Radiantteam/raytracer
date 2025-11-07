@@ -10,15 +10,12 @@
 #include "Color.hpp"
 #include "Ray.hpp"
 #include "Image.hpp"
-#include "Sphere.hpp"
 #include "Plane.hpp"
-#include "Cube.hpp"
 #include "Shape.hpp"
 #include "Vec3.hpp"
 #include "Renderer.hpp"
-#include "SphereGenerator.hpp"
+#include "ShapeGenerator.hpp"
 #include "AntiAliasing.hpp"
-#include "Shape.hpp"
 #include "SceneLoader.hpp"
 #include "DNAgenerator.hpp"
 #include "../include/Timer.hpp"
@@ -37,6 +34,11 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
     int choice;
     std::cin >> choice;
 
+    scene.push_back(std::make_unique<Plane>(
+        Vec3(0, 200.0f, 0),
+        Vec3(0, -1, 0),
+        0.5f));
+
     try
     {
         if (choice == 1)
@@ -48,17 +50,19 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
             std::cout << "Loaded " << loadedScene.shapes.size() << " shapes.\n";
 
             // Keep your default plane, append loaded shapes
-            for (auto &s : loadedScene.shapes) {
+            for (auto &s : loadedScene.shapes)
+            {
                 scene.push_back(std::move(s));
             }
 
             // Add plane below JSON spheres (which are at Y=300 with radius up to 200)
             scene.push_back(std::make_unique<Plane>(
-                Vec3(0, 550.0f, 0),  // Below the lowest sphere point (Y=500)
+                Vec3(0, 550.0f, 0), // Below the lowest sphere point (Y=500)
                 Vec3(0, -1, 0),
                 0.5f));
         }
-        else if (choice == 2) {
+        else if (choice == 2)
+        {
             int sphereCount;
             std::cout << "Combien de sphères veux-tu générer ? ";
             std::cin >> sphereCount;
@@ -70,13 +74,13 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
             }
 
             // Add spheres to the scene
-            auto spheres = SphereGenerator::Generate(sphereCount, width, height);
+            auto spheres = ShapeGenerator::Generate(sphereCount, width, height);
             for (auto &s : spheres)
                 scene.push_back(std::move(s));
 
             // Add plane below random spheres (which are at Y=1 with radius 150)
             scene.push_back(std::make_unique<Plane>(
-                Vec3(0, 200.0f, 0),  // Below the lowest sphere point (Y=151)
+                Vec3(0, 200.0f, 0), // Below the lowest sphere point (Y=151)
                 Vec3(0, -1, 0),
                 0.5f));
         }
@@ -86,7 +90,7 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
             return;
         }
 
-    //Configuration caméra (at Y = 0, same level as spheres)
+        // Configuration caméra (at Y = 0, same level as spheres)
         Vec3 camOrigin = {width / 2.0f, 0.0f, -2500.0f};
 
         // Field of View - Ajuste entre 40° (peu de déformation) et 70° (vue plus large)
@@ -108,69 +112,68 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
         Vec3 lowerLeftCorner = camOrigin + w - horizontal * 0.5f - vertical * 0.5f;
 
         // ==================== ANTI-ALIASING CONFIGURATION ====================
-    // Higher values = smoother edges but slower rendering
-    // samplesPerAxis = 2 → 4 rays/pixel (2x2 grid)   - Fast, noticeable improvement
-    // samplesPerAxis = 4 → 16 rays/pixel (4x4 grid)  - High quality, recommended
-    // samplesPerAxis = 8 → 64 rays/pixel (8x8 grid)  - Ultra quality, very slow
-    AntiAliasing antiAliasing(4);
+        // Higher values = smoother edges but slower rendering
+        // samplesPerAxis = 2 → 4 rays/pixel (2x2 grid)   - Fast, noticeable improvement
+        // samplesPerAxis = 4 → 16 rays/pixel (4x4 grid)  - High quality, recommended
+        // samplesPerAxis = 8 → 64 rays/pixel (8x8 grid)  - Ultra quality, very slow
+        AntiAliasing antiAliasing(4);
 
         // ==================== Timer ====================
-    Timer renderTimer;
+        Timer renderTimer;
 
+        // ----- 2. REPLACED: Original loop is now multithreaded -----
 
-    // ----- 2. REPLACED: Original loop is now multithreaded -----
+        // Get number of available threads
+        unsigned int numThreads = std::thread::hardware_concurrency();
+        if (numThreads == 0)
+            numThreads = 2; // Fallback
+        std::cout << "Rendu avec " << numThreads << " threads." << std::endl;
 
-    // Get number of available threads
-    unsigned int numThreads = std::thread::hardware_concurrency();
-    if (numThreads == 0) numThreads = 2; // Fallback
-    std::cout << "Rendu avec " << numThreads << " threads." << std::endl;
+        std::vector<std::thread> threads;
+        int chunkHeight = height / numThreads;
 
-    std::vector<std::thread> threads;
-    int chunkHeight = height / numThreads;
-
-    // This lambda function contains the exact logic from your original loop
-    //
-    auto renderChunk = [&](int j_start, int j_end)
-    {
-        // Raytracing avec projection perspective uniforme
-        for (int j = j_start; j < j_end; ++j) // Each thread works on a subset of 'j'
+        // This lambda function contains the exact logic from your original loop
+        //
+        auto renderChunk = [&](int j_start, int j_end)
         {
-            for (int i = 0; i < width; ++i)
+            // Raytracing avec projection perspective uniforme
+            for (int j = j_start; j < j_end; ++j) // Each thread works on a subset of 'j'
             {
-                Color pixelColor = antiAliasing.SamplePixel(
-                i, j, width, height,
-               camOrigin, lowerLeftCorner, horizontal, vertical,
-               scene
-           );
+                for (int i = 0; i < width; ++i)
+                {
+                    Color pixelColor = antiAliasing.SamplePixel(
+                        i, j, width, height,
+                        camOrigin, lowerLeftCorner, horizontal, vertical,
+                        scene);
 
-                // SetPixel is thread-safe here because no two threads
-                // will ever write to the same 'j' row.
-                image.SetPixel(i, j, pixelColor);
+                    // SetPixel is thread-safe here because no two threads
+                    // will ever write to the same 'j' row.
+                    image.SetPixel(i, j, pixelColor);
+                }
             }
+        };
+
+        // Launch threads
+        for (int t = 0; t < numThreads; ++t)
+        {
+            int j_start = t * chunkHeight;
+            // Ensure the last thread covers all remaining rows
+            int j_end = (t == numThreads - 1) ? height : (t + 1) * chunkHeight;
+
+            threads.emplace_back(renderChunk, j_start, j_end);
         }
-    };
 
-    // Launch threads
-    for (int t = 0; t < numThreads; ++t)
-    {
-        int j_start = t * chunkHeight;
-        // Ensure the last thread covers all remaining rows
-        int j_end = (t == numThreads - 1) ? height : (t + 1) * chunkHeight;
+        // Wait for all threads to finish
+        for (auto &t : threads)
+        {
+            t.join();
+        }
+        // ----- END of threading changes -----
 
-        threads.emplace_back(renderChunk, j_start, j_end);
+        image.WriteFile(outputFile);
+
+        renderTimer.PrintElapsed("Temps de rendu");
     }
-
-    // Wait for all threads to finish
-    for (auto& t : threads)
-    {
-        t.join();
-    }
-    // ----- END of threading changes -----
-
-    image.WriteFile("image.png");
-
-    renderTimer.PrintElapsed("Temps de rendu");
-}
 
     catch (const std::exception &e)
     {

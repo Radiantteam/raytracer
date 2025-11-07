@@ -8,7 +8,7 @@ add_library(raytracer_lib STATIC
         Cube.cpp
         Plane.cpp
         Renderer.cpp
-        SphereGenerator.cpp
+        ShapeGenerator.cpp
         DNAgenerator.cpp
         AntiAliasing.cpp
         ProgressBar.cpp

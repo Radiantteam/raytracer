@@ -1,6 +1,7 @@
 #include "Ray.hpp"
 #include "Sphere.hpp"
 #include "Plane.hpp"
+#include "Cube.hpp"
 #include "Vec3.hpp"
 #include <algorithm>
 
@@ -21,7 +22,7 @@ static float FresnelSchlick(float cosTheta, float baseReflectivity) {
 }
 
 Color Ray::TraceScene(const std::vector<std::unique_ptr<Shape>>& scene, int depth) const {
-    Color defaultColor = Color(0,0,0);
+    Color defaultColor = Color(0.5f,0.4f,0.5f);
 
     if (depth <= 0) return defaultColor;
 
@@ -81,6 +82,50 @@ Color Ray::TraceScene(const std::vector<std::unique_ptr<Shape>>& scene, int dept
                 surfaceColor.B() * surfaceWeight + reflectionColor.B() * reflectionWeight
             );
         }
+        return surfaceColor;
+    }
+
+    // === Cube shading and reflection ===
+    if (const Cube *hit_cube = dynamic_cast<const Cube *>(hit_shape))
+    {
+        Color surfaceColor = hit_cube->GetShadedColor(hitPoint);
+        float baseReflectivity = hit_cube->GetReflectivity();
+
+        if (baseReflectivity > 0.0f)
+        {
+            // Compute cube face normal - SAME METHOD AS GetShadedColor
+            Vec3 half = Vec3{hit_cube->GetSize() / 2.0f, hit_cube->GetSize() / 2.0f, hit_cube->GetSize() / 2.0f};
+            Vec3 local = hitPoint - hit_cube->GetCenter();
+
+            float distX = half.x - std::abs(local.x);
+            float distY = half.y - std::abs(local.y);
+            float distZ = half.z - std::abs(local.z);
+
+            Vec3 normal;
+            if (distX < distY && distX < distZ) {
+                normal = Vec3((local.x > 0) ? 1.0f : -1.0f, 0.0f, 0.0f);
+            } else if (distY < distZ) {
+                normal = Vec3(0.0f, (local.y > 0) ? 1.0f : -1.0f, 0.0f);
+            } else {
+                normal = Vec3(0.0f, 0.0f, (local.z > 0) ? 1.0f : -1.0f);
+            }
+
+            float cosTheta = std::abs(dot(normalize(-GetDirection()), normal));
+            float fresnelReflectivity = std::min(FresnelSchlick(cosTheta, baseReflectivity), 0.9f);
+
+            Vec3 reflectDir = reflect(GetDirection(), normal);
+            Ray reflectedRay(hitPoint + normal * 1e-4f, reflectDir);
+            Color reflectionColor = reflectedRay.TraceScene(scene, depth - 1);
+
+            float surfaceWeight = 1.0f - fresnelReflectivity;
+            float reflectionWeight = fresnelReflectivity;
+
+            return Color(
+                surfaceColor.R() * surfaceWeight + reflectionColor.R() * reflectionWeight,
+                surfaceColor.G() * surfaceWeight + reflectionColor.G() * reflectionWeight,
+                surfaceColor.B() * surfaceWeight + reflectionColor.B() * reflectionWeight);
+        }
+
         return surfaceColor;
     }
 
