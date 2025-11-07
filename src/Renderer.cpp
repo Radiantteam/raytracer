@@ -1,9 +1,8 @@
 #include <vector>
 #include <memory>
 #include <cmath>
-#include <thread> // <-- 1. ADDED: Include for multithreading
+#include <thread>
 #include <filesystem>
-#include <random>
 #include <iostream>
 
 #include "json.hpp"
@@ -18,7 +17,7 @@
 #include "AntiAliasing.hpp"
 #include "SceneLoader.hpp"
 #include "DNAgenerator.hpp"
-#include "../include/Timer.hpp"
+#include "Timer.hpp"
 
 void render_scene(int width, int height, float screenZ, const char *outputFile)
 {
@@ -33,11 +32,6 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
 
     int choice;
     std::cin >> choice;
-
-    scene.push_back(std::make_unique<Plane>(
-        Vec3(0, 200.0f, 0),
-        Vec3(0, -1, 0),
-        0.5f));
 
     try
     {
@@ -55,9 +49,9 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
                 scene.push_back(std::move(s));
             }
 
-            // Add plane below JSON spheres (which are at Y=300 with radius up to 200)
+            // Add plane below JSON shapes
             scene.push_back(std::make_unique<Plane>(
-                Vec3(0, 550.0f, 0), // Below the lowest sphere point (Y=500)
+                Vec3(0, 550.0f, 0), // Below the lowest shape point (Y=500)
                 Vec3(0, -1, 0),
                 0.5f));
         }
@@ -73,14 +67,14 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
                 return;
             }
 
-            // Add spheres to the scene
+            // Add shapes to the scene
             auto spheres = ShapeGenerator::Generate(sphereCount, width, height);
             for (auto &s : spheres)
                 scene.push_back(std::move(s));
 
-            // Add plane below random spheres (which are at Y=1 with radius 150)
+            // Add plane below random shapes
             scene.push_back(std::make_unique<Plane>(
-                Vec3(0, 200.0f, 0), // Below the lowest sphere point (Y=151)
+                Vec3(0, 200.0f, 0), // Below the lowest shape point (Y=151)
                 Vec3(0, -1, 0),
                 0.5f));
         }
@@ -132,8 +126,6 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
         std::vector<std::thread> threads;
         int chunkHeight = height / numThreads;
 
-        // This lambda function contains the exact logic from your original loop
-        //
         auto renderChunk = [&](int j_start, int j_end)
         {
             // Raytracing avec projection perspective uniforme
@@ -168,7 +160,6 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
         {
             t.join();
         }
-        // ----- END of threading changes -----
 
         image.WriteFile(outputFile);
 
