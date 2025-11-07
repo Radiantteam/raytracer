@@ -7,6 +7,8 @@ struct Vec3 {
 
     Vec3() : x(0), y(0), z(0) {}
     Vec3(float X, float Y, float Z) : x(X), y(Y), z(Z) {}
+    Vec3(float v) : x(v), y(v), z(v) {}
+
 
     Vec3 operator+(const Vec3& v) const { return {x+v.x, y+v.y, z+v.z}; }
     Vec3 operator-(const Vec3& v) const { return {x-v.x, y-v.y, z-v.z}; }
