@@ -19,3 +19,13 @@ cmake --build build -j
 ```bash
 cd build && ctest --output-on-failure
 ```
+## Construction image docker
+```bash
+docker build -t raytracer_image -f Dockerfile .
+```
+
+## Lancement du la commande via le conteneur
+```bash
+docker run --rm -it -v "$(pwd)/output:/output" raytracer_image
+```
+
