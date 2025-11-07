@@ -37,40 +37,26 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
     int choice;
     std::cin >> choice;
 
-    scene.push_back(std::make_unique<Plane>(
-        Vec3(0, 300.0f, 0),
-        Vec3(0, -1, 0),
-        0.5f));
-
     try
     {
         if (choice == 1)
         {
             std::string outputPath = "../scene_boules.json";
 
-            // //génère toujours la scène ADN centrée
-            //  SceneGenerator::GenerateDNAAiryCentered(
-            //      outputPath,
-            //      width,
-            //      height,
-            //      300,    // nombre de paires (600 sphères)
-            //      250.0f, // rayon hélice
-            //      15.0f,  // espacement vertical
-            //      0.18f,  // rotation par étape
-            //      true,   // ponts ADN
-            //      35.0f,  // rayon sphère
-            //      14.0f   // rayon pont
-            //  );
-
-            // std::cout << " Scène ADN générée → " << outputPath << "\n";
-
             // charge la scène générée
             auto loadedScene = SceneLoader::LoadFromFile(outputPath);
             std::cout << "Loaded " << loadedScene.shapes.size() << " shapes.\n";
 
             // Keep your default plane, append loaded shapes
-            for (auto &s : loadedScene.shapes)
+            for (auto &s : loadedScene.shapes) {
                 scene.push_back(std::move(s));
+            }
+
+            // Add plane below JSON spheres (which are at Y=300 with radius up to 200)
+            scene.push_back(std::make_unique<Plane>(
+                Vec3(0, 550.0f, 0),  // Below the lowest sphere point (Y=500)
+                Vec3(0, -1, 0),
+                0.5f));
         }
         else if (choice == 2) {
             int sphereCount;
@@ -87,17 +73,18 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
             auto spheres = SphereGenerator::Generate(sphereCount, width, height);
             for (auto &s : spheres)
                 scene.push_back(std::move(s));
+
+            // Add plane below random spheres (which are at Y=1 with radius 150)
+            scene.push_back(std::make_unique<Plane>(
+                Vec3(0, 200.0f, 0),  // Below the lowest sphere point (Y=151)
+                Vec3(0, -1, 0),
+                0.5f));
         }
         else
         {
             std::cerr << "Invalid option.\n";
             return;
         }
-        // Add the plane to the main scene (below the spheres)
-    scene.push_back(std::make_unique<Plane>(
-        Vec3(0, 200.0f, 0),
-        Vec3(0, -1, 0),
-        0.5f));
 
     //Configuration caméra (at Y = 0, same level as spheres)
         Vec3 camOrigin = {width / 2.0f, 0.0f, -2500.0f};
@@ -180,7 +167,7 @@ void render_scene(int width, int height, float screenZ, const char *outputFile)
     }
     // ----- END of threading changes -----
 
-    image.WriteFile("test.png");
+    image.WriteFile("image.png");
 
     renderTimer.PrintElapsed("Temps de rendu");
 }
