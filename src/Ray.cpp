@@ -1,3 +1,76 @@
+/**
+ * ============================================================================
+ * Ray.cpp - Ray Tracing Core Logic
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * This file implements the core ray tracing algorithm that simulates how light
+ * travels through a 3D scene. It traces rays (imaginary light beams) from the
+ * camera through each pixel and determines what color that pixel should be
+ * based on what the ray hits in the scene.
+ *
+ * KEY CONCEPTS FOR BEGINNERS:
+ *
+ * 1. RAY: A mathematical line starting at a point (origin) and going in a
+ *    direction. Think of it as a laser beam shot from the camera through a pixel.
+ *
+ * 2. INTERSECTION: When a ray hits an object in the scene (sphere, plane, etc.)
+ *
+ * 3. RECURSIVE RAY TRACING: When a ray hits a reflective surface, we cast
+ *    another ray (reflection ray) to see what that surface reflects. This
+ *    continues up to a maximum depth to prevent infinite loops.
+ *
+ * ALGORITHMS USED:
+ *
+ * 1. **Ray-Object Intersection Testing**
+ *    - For each ray, we test if it hits any object in the scene
+ *    - We keep track of the CLOSEST hit (the object we see first)
+ *    - Algorithm: Linear search through all objects, comparing distances
+ *
+ * 2. **Fresnel Effect (Schlick's Approximation)**
+ *    - Models how reflectivity changes based on viewing angle
+ *    - Looking at a surface straight-on: less reflective
+ *    - Looking at a surface at grazing angles: more reflective (like a shiny car)
+ *    - Formula: R(θ) = R₀ + (1 - R₀)(1 - cos(θ))⁵
+ *    - This creates realistic metallic appearance
+ *
+ * 3. **Recursive Reflection Tracing**
+ *    - When ray hits reflective surface, compute reflection direction
+ *    - Cast new ray in reflection direction (recursive call)
+ *    - Mix surface color with reflected color based on reflectivity
+ *    - Depth parameter prevents infinite recursion (max depth = 5)
+ *
+ * 4. **Surface Shading**
+ *    - Spheres: Use Blinn-Phong shading with Fresnel effect
+ *    - Planes: Checkerboard pattern with optional reflections
+ *
+ * HOW IT WORKS (Step by step):
+ *
+ * Step 1: Ray is cast from camera through a pixel
+ * Step 2: Test intersection with ALL objects in scene
+ * Step 3: Find the CLOSEST object that was hit
+ * Step 4: Calculate hit point (where ray touched the object)
+ * Step 5: Get surface color at hit point (with lighting/shading)
+ * Step 6: If surface is reflective:
+ *         - Apply Fresnel effect based on view angle
+ *         - Cast reflection ray (recursive call with depth-1)
+ *         - Mix surface color with reflection color
+ * Step 7: Return final color for this pixel
+ *
+ * IMPORTANT DETAILS:
+ *
+ * - Small epsilon offset (1e-4f): When casting reflection rays, we move the
+ *   origin slightly away from the surface to prevent "shadow acne" (self-
+ *   intersection artifacts where a surface reflects itself incorrectly)
+ *
+ * - Color mixing uses raw floats: To avoid premature clamping that causes
+ *   artifacts, we work with raw float values and only create the final Color
+ *   object at the end
+ *
+ * - dynamic_cast: Used to determine which type of shape was hit (Sphere or
+ *   Plane) so we can apply the appropriate shading model
+ */
+
 #include "Ray.hpp"
 #include "Sphere.hpp"
 #include "Plane.hpp"

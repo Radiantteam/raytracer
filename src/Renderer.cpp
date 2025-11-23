@@ -1,3 +1,142 @@
+/**
+ * ============================================================================
+ * Renderer.cpp - Main Rendering Pipeline with Multithreading
+ * ============================================================================
+ *
+ * WHAT THIS FILE DOES:
+ * This is the "conductor" of the ray tracing orchestra. It coordinates all the
+ * pieces (scene setup, camera configuration, ray tracing, anti-aliasing, and
+ * multithreading) to produce the final rendered image. Think of it as the main
+ * control center that orchestrates the entire rendering process.
+ *
+ * THE BIG PICTURE - RENDERING PIPELINE:
+ *
+ * 1. SCENE SETUP
+ *    └─> Load shapes (spheres, planes) from JSON or generate randomly
+ *
+ * 2. CAMERA CONFIGURATION
+ *    └─> Position camera, calculate field of view, set up viewport
+ *
+ * 3. PIXEL RENDERING (multithreaded)
+ *    └─> For each pixel: cast rays → trace scene → compute color
+ *
+ * 4. IMAGE OUTPUT
+ *    └─> Write final image to PNG file
+ *
+ * KEY ALGORITHMS USED:
+ *
+ * 1. **Perspective Camera Model**
+ *    Simulates how a real camera sees the world with depth and perspective.
+ *
+ *    Components:
+ *    - Camera Origin: The "eye" position in 3D space
+ *    - Field of View (FOV): How wide the camera "sees" (like zoom on a camera)
+ *    - Viewport: Virtual screen in 3D space that rays pass through
+ *
+ *    How it works:
+ *    - Calculate viewport size based on FOV and aspect ratio
+ *    - For each pixel, compute where it maps on the virtual viewport
+ *    - Cast ray from camera through that viewport point
+ *    - Objects further away appear smaller (perspective)
+ *
+ *    Math:
+ *    viewportHeight = 2.0 × tan(FOV/2)
+ *    viewportWidth = viewportHeight × aspectRatio
+ *
+ * 2. **Multithreaded Rendering (Work Division)**
+ *    Speeds up rendering by using multiple CPU cores simultaneously.
+ *
+ *    Strategy: Horizontal Scanline Division
+ *    - Divide image into horizontal strips (one per CPU thread)
+ *    - Each thread renders its assigned rows independently
+ *    - No shared data between threads → thread-safe without locks
+ *
+ *    Example with 4 threads on 1080 pixel height:
+ *    Thread 0: rows    0 -  269
+ *    Thread 1: rows  270 -  539
+ *    Thread 2: rows  540 -  809
+ *    Thread 3: rows  810 - 1079
+ *
+ *    Why this works:
+ *    - Each thread writes to different rows → no race conditions
+ *    - Balanced workload (each thread gets ~same number of pixels)
+ *    - Near-linear speedup (4 threads ≈ 4× faster)
+ *
+ * 3. **Ray Generation for Each Pixel**
+ *    Converts 2D pixel coordinates to 3D rays in world space.
+ *
+ *    Steps:
+ *    a) Normalize pixel coords to [0, 1] range: u = x/(width-1), v = y/(height-1)
+ *    b) Map to viewport: point = lowerLeft + horizontal*u + vertical*v
+ *    c) Ray direction: normalize(point - cameraOrigin)
+ *    d) Cast ray and trace through scene (handled by AntiAliasing class)
+ *
+ * HOW THE RENDERER WORKS (Complete Flow):
+ *
+ * Step 1: USER INPUT
+ *         - Choice 1: Load scene from JSON file (predefined spheres)
+ *         - Choice 2: Generate random spheres procedurally
+ *
+ * Step 2: SCENE CONSTRUCTION
+ *         - Load/generate shapes (spheres)
+ *         - Add ground plane with checkerboard pattern
+ *         - Plane position adjusted based on sphere positions
+ *
+ * Step 3: CAMERA SETUP
+ *         - Position: (width/2, 0, -2500) - centered, looking down +Z axis
+ *         - FOV: 50 degrees (balanced between wide-angle and realistic)
+ *         - Calculate viewport dimensions from FOV and aspect ratio
+ *         - Compute viewport vectors (horizontal, vertical, lowerLeftCorner)
+ *
+ * Step 4: ANTI-ALIASING CONFIGURATION
+ *         - Create AntiAliasing object with samplesPerAxis (default: 4)
+ *         - This determines quality vs speed trade-off
+ *
+ * Step 5: MULTITHREADED RENDERING
+ *         - Detect available CPU cores (hardware_concurrency)
+ *         - Divide image height into chunks (one per thread)
+ *         - Launch threads with lambda function capturing scene data
+ *         - Each thread:
+ *           * Iterates through its assigned rows
+ *           * For each pixel in row:
+ *             - Calls AntiAliasing::SamplePixel()
+ *             - Gets anti-aliased color
+ *             - Writes to image buffer
+ *         - Wait for all threads to complete (join)
+ *
+ * Step 6: OUTPUT
+ *         - Write image buffer to PNG file
+ *         - Print elapsed rendering time
+ *
+ * COORDINATE SYSTEM:
+ *
+ * - X: Left to right (0 to width)
+ * - Y: Top to bottom in screen space, but in world space higher Y = lower position
+ * - Z: Camera looks toward +Z (into the scene)
+ *
+ * PERFORMANCE OPTIMIZATIONS:
+ *
+ * 1. Multithreading: Parallelizes pixel rendering across CPU cores
+ * 2. Horizontal division: Cache-friendly memory access pattern
+ * 3. Lambda capture by reference: Avoids copying large scene data
+ * 4. Pre-computed camera vectors: Calculate once, reuse for all pixels
+ * 5. Timer: Helps measure and optimize rendering performance
+ *
+ * THREAD SAFETY:
+ *
+ * - Each thread writes to DIFFERENT rows → no race conditions
+ * - Image::SetPixel() doesn't need locks (different memory locations)
+ * - Scene data is read-only after setup → safe to share across threads
+ * - AntiAliasing and Ray objects created per-pixel → no sharing
+ *
+ * IMPORTANT PARAMETERS:
+ *
+ * - samplesPerAxis: 2-8 (quality vs speed)
+ * - FOV: 40-70 degrees (narrow to wide view)
+ * - Recursion depth: 5 (in Ray.cpp)
+ * - Camera position: Affects perspective and visible objects
+ */
+
 #include <vector>
 #include <memory>
 #include <cmath>
